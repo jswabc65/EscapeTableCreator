@@ -1121,7 +1121,7 @@
 						} else if (item.nextIsDinner) {
 							intervalText = intervalText = '<span style="font-weight: bold; color: blue">(저녁 시간 ' + interval + '분)</span>';
 						} else {
-							intervalText = '(저녁 시간 ' + interval + '분)';
+							intervalText = '(대기 시간 ' + interval + '분)';
 						}
 						const intervalRow = document.createElement("tr");
 						intervalRow.innerHTML = '<td colspan="7">' + intervalText + '</td>';
