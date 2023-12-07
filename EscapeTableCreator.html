@@ -1077,6 +1077,10 @@
 			nameCell.textContent = scheduleName;
 			nameRow.appendChild(nameCell);
 			container.appendChild(nameRow);
+			
+			const dateCell = document.createElement("h2");
+			dateCell.textContent = dateSelect.value;
+			container.appendChild(dateCell);
 
 			// 표 요소 생성
 			const table = document.createElement("table");
