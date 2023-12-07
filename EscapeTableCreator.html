@@ -3,6 +3,54 @@
 <head>
     <title>연방 생성기</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body {
+			font-size: 16px;
+			margin: 0;
+			padding: 0;
+		}
+
+		p {
+			font-size: 20px;
+			font-weight: bold;
+			text-align: center;
+			margin-top: 10px;
+		}
+
+		label {
+			font-size: 16px;
+		}
+
+		select, input[type="number"], textarea {
+			font-size: 16px;
+			width: 100%;
+			padding: 5px;
+			margin: 5px 0;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+		}
+
+		input[type="checkbox"] {
+			margin-right: 5px;
+		}
+
+		#lunchGroup, #dinnerGroup {
+			display: none;
+		}
+
+		button {
+			width: 100%;
+			height: 50px;
+			text-align: center;
+			font-size: 24px;
+			font-weight: bold;
+			background-color: #007BFF;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+	</style>
 </head>
 <body>
 	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J</p>
@@ -24,10 +72,10 @@
 	<br>
 	
 	<!-- UI - 추천도 입력 박스 -->
-	<label>테마 추천도 필터:</label>
-		<input type="number" id="minRating" min="0" max="10" value="0" style="width: 30px; text-align: center;">
+	<label>테마 추천도 필터 (0~10) :</label>
+		<input type="number" id="minRating" min="0" max="10" value="0" style="width: 40px; text-align: center;">
 		<label> ~ </label>
-		<input type="number" id="maxRating" min="0" max="10" value="10" style="width: 30px; text-align: center;"><br>
+		<input type="number" id="maxRating" min="0" max="10" value="10" style="width: 40px; text-align: center;"><br>
 	
 	<!-- UI - 날짜 선택 박스 -->
 	<label for="dateSelect">날짜 선택:</label>
@@ -38,34 +86,34 @@
 	
 	<!-- UI - 시간 입력 박스 -->
 	<label>희망 진행 시간:</label>
-	<input type="number" id="startHour" min="0" max="24" value="10" style="width: 30px; text-align: center;">
+	<input type="number" id="startHour" min="0" max="24" value="10" style="width: 40px; text-align: center;">
 	<label>:</label>
-	<input type="number" id="startMinute" min="0" max="59" value="0" style="width: 30px; text-align: center;">
+	<input type="number" id="startMinute" min="0" max="59" value="0" style="width: 40px; text-align: center;">
 	<label> ~ </label>
-	<input type="number" id="endHour" min="0" max="24" value="23" style="width: 30px; text-align: center;">
+	<input type="number" id="endHour" min="0" max="24" value="23" style="width: 40px; text-align: center;">
 	<label>:</label>
-	<input type="number" id="endMinute" min="0" max="59" value="0" style="width: 30px; text-align: center;">
+	<input type="number" id="endMinute" min="0" max="59" value="0" style="width: 40px; text-align: center;">
 	<br>
 	
 	<!-- UI - 식사 선택 -->
     <input type="checkbox" id="lunchChk" value="true"> 점심 먹을꺼면 체크<br>
 	<div id="lunchGroup">
 		<label>빠르면 언제 먹을래?:</label>
-		<input type="number" id="lunchHour" min="0" max="24" value="11" style="width: 30px; text-align: center;">
+		<input type="number" id="lunchHour" min="0" max="24" value="11" style="width: 40px; text-align: center;">
 		<label>:</label>
-		<input type="number" id="lunchMinute" min="0" max="59" value="30" style="width: 30px; text-align: center;"><br>
+		<input type="number" id="lunchMinute" min="0" max="59" value="30" style="width: 40px; text-align: center;"><br>
 		<label>점심 최소 시간 보장:</label>
-		<input type="number" id="lunchInterval" min="0" max="24" value="45" style="width: 30px; text-align: center;">
+		<input type="number" id="lunchInterval" min="0" max="24" value="45" style="width: 40px; text-align: center;">
 		<label>분</label>
 	</div>
 	<input type="checkbox" id="dinnerChk" value="true"> 저녁 먹을꺼면 체크<br>
 	<div id="dinnerGroup">
 		<label>빠르면 언제 먹을래?:</label>
-		<input type="number" id="dinnerHour" min="0" max="24" value="17" style="width: 30px; text-align: center;">
+		<input type="number" id="dinnerHour" min="0" max="24" value="17" style="width: 40px; text-align: center;">
 		<label>:</label>
-		<input type="number" id="dinnerMinute" min="0" max="59" value="30" style="width: 30px; text-align: center;"><br>
+		<input type="number" id="dinnerMinute" min="0" max="59" value="30" style="width: 40px; text-align: center;"><br>
 		<label>저녁 최소 시간 보장:</label>
-		<input type="number" id="dinnerInterval" min="0" max="24" value="45" style="width: 30px; text-align: center;">
+		<input type="number" id="dinnerInterval" min="0" max="24" value="45" style="width: 40px; text-align: center;">
 		<label>분</label>
 	</div>
 	<br>
@@ -254,7 +302,7 @@
 		}
     </script>
 
-    <!-- 자바스크립트 코드를 직접 포함 -->
+    <!-- 실제 내부 동작 스크립트 -->
     <script>
 		// 사전 세팅 값
 		const waitTerm = 10 // 테마 후 다음 테마까지 최소 대기 시간
