@@ -64,7 +64,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 	<!-- UI - 타이틀 -->
-	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v3</p>
+	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v4</p>
 	
 	<button onclick="SearchData('트미J', '석손')" style="width: 350px; height: 50px; text-align: center; font-size: 24px; font-weight: bold;">조회 테스트!</button><br><br>
 	
@@ -1528,22 +1528,16 @@
 		.concat('name4=', name4);
 		
 		const SearchHeaders = {
-			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+			"Accept": "*/*",
 			"Accept-Encoding": "gzip, deflate, br",
 			"Accept-Language": "ko,en-US;q=0.9,en;q=0.8,ja;q=0.7",
 			"Connection": "keep-alive",
-			"Cookie": "_gid=GA1.2.440463739.1702378741; _gat_gtag_UA_157166976_1=1; _ga_XH0QBBNBEV=GS1.1.1702378739.54.1.1702378747.52.0.0; _ga=GA1.1.2131712051.1697595858",
 			"Host": "colory.mooo.com",
-			"Referer": "https://colory.mooo.com/us",
+			"Origin": "colory.mooo.com",
+			"Referer": "https://colory.mooo.com/us/",
 			"Sec-Fetch-Dest": "document",
 			"Sec-Fetch-Mode": "no-cors",
-			"Sec-Fetch-Site": "same-origin",
-			"Sec-Fetch-User": "?1",
-			"Upgrade-Insecure-Requests": "1",
-			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-			"sec-ch-ua": "\"Google Chrome\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"",
-			"sec-ch-ua-mobile": "?0",
-			"sec-ch-ua-platform": "\"Windows\""
+			"Sec-Fetch-Site": "no-cors",
 		};
 		
 		let SearchRequestOptions = {
