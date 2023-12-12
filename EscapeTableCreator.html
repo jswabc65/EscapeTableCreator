@@ -863,6 +863,8 @@
 			// 직전 테마와의 거리, 평점, 대기 시간 차이 등을 점수화 시키고
 			// 점수 내림차순으로 정렬하고자 함.
 			
+			if (arr.length == 0) { return; }
+			
 			// 사전 처리로 남은 테마들 중 가장 예약 시간이 이른 시간을 확인하여 minTime에 넣기.
 			let minTime = arr[0].reserve_times[0];
 			for (let i = 0; i < arr.length; i++) {
