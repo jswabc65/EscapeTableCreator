@@ -78,11 +78,17 @@
     </select>
 	<br>
 	
-	<!-- UI - 추천도 입력 박스 -->
-	<label>테마 추천도 필터 (0~10) :</label>
+	<!-- UI - 평점 입력 박스 -->
+	<label>테마 평점 필터 (0~10) :</label>
 		<input type="number" id="minRating" min="0" max="10" value="0" style="width: 40px; text-align: center;">
 		<label> ~ </label>
 		<input type="number" id="maxRating" min="0" max="10" value="10" style="width: 40px; text-align: center;"><br>
+		
+	<!-- UI - 난이도 입력 박스 -->
+	<label>테마 난이도 필터 (0~10) :</label>
+		<input type="number" id="minDiff" min="0" max="10" value="0" style="width: 40px; text-align: center;">
+		<label> ~ </label>
+		<input type="number" id="maxDiff" min="0" max="10" value="10" style="width: 40px; text-align: center;"><br>
 	
 	<!-- UI - 날짜 선택 박스 -->
 	<label for="dateSelect">날짜 선택:</label>
@@ -125,13 +131,13 @@
 	</div>
 	<br>
 	
-	<label>여기에 입력한 테마들은 가급적 스케줄에 포함됩니다.</label><br>
-	<label>(콤마(,)를 이용하여 테마 이름을 구분해 주세요)</label><br>
+	<label>여기에 입력한 테마들을 우선 스케줄에 포함시킵니다.</label><br>
+	<label>(콤마 or 슬래쉬 or 줄바꿈을 이용하여 테마 이름을 구분해 주세요)</label><br>
 	<textarea id="wantedList" rows="4" cols="50"></textarea>
 	<br><br>
 	
 	<label>여기에 입력한 테마들은 절대 스케줄에 포함되지 않습니다.</label><br>
-	<label>(콤마(,)를 이용하여 테마 이름을 구분해 주세요)</label><br>
+	<label>(콤마 or 슬래쉬 or 줄바꿈을 이용하여 테마 이름을 구분해 주세요)</label><br>
 	<textarea id="bannedList" rows="4" cols="50"></textarea>
 	<br><br>
 	
@@ -372,11 +378,15 @@
 		// 사전 세팅 값
 		const waitTerm = 10 // 테마 후 다음 테마까지 최소 대기 시간
 		const movingTimePerMeter = 0.21 // 테마 후 다른 매장으로 이동 시 1M 거리 당 추가 발생 시간 기준 값
+		let lunchMaxInterval = 210; // lunchStartTime 이후 최대 몇분 이후까지는 점심 먹기를 시작해야 할 지
+		let dinnerMaxInterval = 210; // dinnerStartTime 이후 최대 몇분 이후까지는 저녁 먹기를 시작해야 할 지
 	
 		let bannedList;
 		let wantedList;
 		let minRating;
 		let maxRating;
+		let minDiff;
+		let maxDiff;
 		let dayoffset;
 		let starttime;
 		let endtime;
@@ -401,6 +411,8 @@
 			if(wantedList[0] == '') { wantedList = []; }
 			minRating = Int(document.getElementById("minRating").value);
 			maxRating = Int(document.getElementById("maxRating").value);
+			minDiff = Int(document.getElementById("minDiff").value);
+			maxDiff = Int(document.getElementById("maxDiff").value);
 			dayoffset = CalcOffsetDay(document.getElementById("dateSelect").value);
 			starttime = ConvertTimeToMinutes(document.getElementById("startHour").value, document.getElementById("startMinute").value);
 			endtime = ConvertTimeToMinutes(document.getElementById("endHour").value, document.getElementById("endMinute").value);
@@ -550,10 +562,17 @@
 									return null;
 								}
 								
-								// 평점이 minRating 미만이거나 maxRating 이상이면 제거 (흙길 하고 싶은 사람을 위한 max 필터...)
+								// 평점이 minRating 미만이거나 maxRating 초과면 제거 (흙길 하고 싶은 사람을 위한 max 필터...)
 								if ((hit.recommendTotalRating * 10) < minRating) {
 									return null;
 								} else if ((hit.recommendTotalRating * 10) > maxRating) {
+									return null;
+								}
+								
+								// 난이도가 minDiff 미만이거나 maxDiff 초과면 제거 (쉬운것만 or 어려운것만 원하는 사람을 위한 필터...)
+								if ((hit.difficultyTotalRating * 2) < minDiff) {
+									return null;
+								} else if ((hit.difficultyTotalRating * 2) > maxDiff) {
 									return null;
 								}
 								
@@ -610,10 +629,9 @@
 					lunch_flag = ori_lunch_flag;
 					dinner_flag = ori_dinner_flag;
 					
-					// 우선 테마들이 있는 경우에는 우선 테마만 스타팅 테마가 되게 처리
+					// 선호 테마들이 있는 경우에는 선호 테마만 스타팅 테마가 되게 처리
 					if (wantedList.length > 0 && extractedData[p].wanted != true) {
-						//continue;
-						// 일단 해당 기능은 꺼놓음
+						continue;
 					}
 				
 					// 추출한 데이터를 스케쥴 가공용으로 복제
@@ -630,8 +648,24 @@
 					// 시작 시간을 nextTargetTime에 초기화
 					let nextTargetTime = starttime;
 					
+					// 모든 테마 돌면서 다음 스케쥴 체크
 					while (nextTargetTime >= 0 && nextTargetTime < endtime) {
 						nextTargetTime = PickFirstData(copyData, schedule, nextTargetTime);
+					}
+					
+					// 선호 테마가 존재하는 경우에는 중간에 빈 타임에 다시 다른 테마들 끼워넣을 수 있게끔 추가 스케줄 체킹
+					if (wantedList.length > 0 && schedule.length > 0) {
+						// 시간 다시 체크해야 하므로 copyData 재복제
+						copyData = JSON.parse(JSON.stringify(extractedData));
+						
+						// 선호 테마를 제외한 테마들을 끼워 넣으므로 선호테마는 빠지도록 필터링
+						copyData = copyData.filter(data => {
+							if (data.wanted != true) { return true; }
+							else { return false; }
+						})
+						
+						// 중간 채워넣기 함수 실행
+						FillMidSchedule(copyData, schedule);
 					}
 					
 					schedules.push(schedule);
@@ -643,6 +677,146 @@
 				// 추출한 데이터를 출력
 				PrintSchedules(schedules, extractedData, resultElement);
 			});
+		}
+		
+		// 선호 리스트로 스케쥴 생성 후 중간 비는 시간에 스케쥴 채워넣는 함수
+		function FillMidSchedule(copyData, schedule) {
+			for (let i = 0; i <= schedule.length; i++) {
+				let afterData = [];
+				let waitInterval = 0
+				let midStartTime = starttime;
+				let midEndTime = endtime;
+				let beforeGeoX = -1;
+				let beforeGeoY = -1;
+				let afterGeoX = -1;
+				let afterGeoY = -1;
+				let beforeData = [];
+				
+				if (i < schedule.length) {	// 막순서 스케쥴 체크가 아니라면
+					afterData = schedule[i];
+					waitInterval = afterData.waitInterval; // 이전 타임과 현재 선택된 스케쥴 사이에 대기 시간이 얼마나 있는지 체크
+					midStartTime = afterData.time - waitInterval;
+					midEndTime = afterData.time;
+					
+					// after 좌표 갱신
+					afterGeoX = afterData.geoX;
+					afterGeoY = afterData.geoY;
+				} else {	// 막순서라면
+					midStartTime = schedule[i-1].time + schedule[i-1].playtime;
+				}
+				
+				// 중간에 채워놓을 시간의 가능한 StartTime 구하기
+				// 첫번째 스케쥴이 아닌 경우
+				if (i > 0) {
+					beforeData = schedule[i-1];
+				
+					// 이전 테마 끝나고 식사 시간인지 확인
+					if (beforeData.nextIsLunch == true) {	// 점심 시간이면 최소 시간 보장
+						midStartTime += lunchInterval;
+					} else if (beforeData.nextIsDinner == true) {	// 저녁 시간이면 최소 시간 보장
+						midStartTime += dinnerInterval;
+					} else {	// 점심,저녁 아니면 기본 waitTerm 보장
+						midStartTime += waitTerm;
+					}
+					
+					// before 좌표 갱신
+					beforeGeoX = beforeData.geoX;
+					beforeGeoY = beforeData.geoY;
+				}
+				
+				// copyData 다시 재복제
+				let anotherData = JSON.parse(JSON.stringify(copyData));
+				
+				// 각 테마를 돌면서 중간에 채워넣을 수 있는 시간만 필터링
+				for (let j = 0; j < anotherData.length; j++) {
+					let data = anotherData[j];
+					
+					// 이전 테마 매장으로부터 현 테마 매장으로까지 이동 거리에 따른 시간 계산
+					let distTime = 0;
+					if(beforeGeoX > 0 && beforeGeoY > 0) {
+						distTime = calcDist(data.geoX, data.geoY, beforeGeoX, beforeGeoY) * movingTimePerMeter; // 두 매장간의 거리를 계산 후 거리 당 걸리는 시간을 적용하여 필요 시간 산출.
+						distTime = Math.ceil(distTime / 5) * 5; // 필요 시간이 5의 배수로 나올 수 있도록 올림 처리.
+					}
+					
+					// 현 테마 매장에서 다음 테마 매장으로까지 이동 거리에 따른 시간 계산
+					let nextDistTime = 0;
+					if(afterGeoX > 0 && afterGeoY > 0) {
+						nextDistTime = calcDist(data.geoX, data.geoY, afterData.geoX, afterData.geoY) * movingTimePerMeter; // 두 매장간의 거리를 계산 후 거리 당 걸리는 시간을 적용하여 필요 시간 산출.
+						nextDistTime = Math.ceil(distTime / 5) * 5; // 필요 시간이 5의 배수로 나올 수 있도록 올림 처리.
+					}
+					
+					data.reserve_times = data.reserve_times.filter(time => time >= (midStartTime + distTime)); // 시작 시간 필터
+					data.reserve_times = data.reserve_times.filter(time => time <= (midEndTime - (nextDistTime + waitTerm + data.playtime))); // 종료 시간 필터
+					
+					// 만약 reserve_times 배열이 빈 배열이라면 해당 데이터 제거
+					if (data.reserve_times.length == 0) {
+						anotherData.splice(j, 1);
+						j--; // 데이터가 제거되면 인덱스를 하나 줄입니다.
+					}
+				}
+				
+				// 필터링 후 anotherData에 값이 남아있다면 정렬 후 중간에 끼워넣기
+				if (anotherData.length > 0) {
+					// 점수 순으로 정렬
+					DataSort(anotherData, beforeGeoX, beforeGeoY)
+				
+					let calcInterval = starttime;
+					if (i > 0) {
+						calcInterval = schedule[i-1].time + schedule[i-1].playtime;
+					}
+					let theme = {
+						title: anotherData[0].title,
+						store: anotherData[0].store_name,
+						playtime: anotherData[0].playtime,
+						rating: (anotherData[0].rating),
+						difficulty: (anotherData[0].difficulty),
+						time: anotherData[0].reserve_times[0],
+						score: anotherData[0].totalScore,
+						waitInterval: anotherData[0].reserve_times[0] - calcInterval,
+						momvingDist: anotherData[0].movingDist,
+						geoX: anotherData[0].geoX,
+						geoY: anotherData[0].geoY,
+						wanted: anotherData[0].wanted
+					};
+					
+					// 점심 & 저녁 시간 체크 처리
+					if (lunch_flag && lunchStartTime <= (theme.time + theme.playtime) && (theme.time + theme.playtime + lunchInterval) <= midEndTime && (lunchStartTime + lunchMaxInterval) >= (theme.time + theme.playtime)) {
+						theme.nextIsLunch = true;
+						lunch_flag = false;
+					}
+					if (dinner_flag && dinnerStartTime <= (theme.time + theme.playtime) && (theme.time + theme.playtime + dinnerInterval) <= midEndTime && (dinnerStartTime + dinnerMaxInterval) >= (theme.time + theme.playtime)) {
+						theme.nextIsDinner = true;
+						dinner_flag = false;
+					}
+					
+					schedule.splice(i, 0, theme); 
+					
+					// 중간에 테마 끼어넣었다면 다음 테마의 waitInterval / 이전 테마의 movingDist 갱신 필요
+					if (i < schedule.length) {
+						afterData.waitInterval = afterData.time - (theme.time + theme.playtime);
+					}
+					if (i > 0) {
+						beforeData.movingDist = calcDist(theme.geoX, theme.geoY, beforeData.geoX, beforeData.geoY);
+					}
+					
+					// 중간에 테마 끼어넣었다면 해당 테마가 다시 중간에 끼어들지 않게끔 copyData에서 제거 필요
+					copyData = RemoveThemeByTitle(copyData, theme.title);
+				} else {
+					continue;
+				}
+			}
+		}
+		
+		// 배열에서 title이 일치하는 테마를 찾아 제거하는 함수
+		function RemoveThemeByTitle(arr, title) {
+			arr = arr.filter(data => {
+			
+				if (data.title === title) { return false; }
+				else { return true; }
+			
+			});
+			
+			return arr;
 		}
 		
 		// 데이터를 reserve_times의 첫번째 값 기준 오름차순으로 정렬
@@ -662,11 +836,16 @@
 			
 			// 정렬 처리 시작
 			arr.sort((a, b) => {
-				// 우선 테마 점수 책정
-				let wantedScoreA = 0;
-				let wantedScoreB = 0;
-				if (a.wanted) { wantedScoreA = 5; }
-				if (b.wanted) { wantedScoreB = 5; }
+				// 선호 테마일 경우 무조건 우선 정렬
+				let wantedA = 0;
+				let wantedB = 0;
+				if (a.wanted) { wantedA = 1; }
+				if (b.wanted) { wantedB = 1; }
+				
+				// 1차 정렬: 선호 테마 내림차순
+				if (wantedA !== wantedB) {
+					return wantedB - wantedA;
+				}
 			
 				// 거리 점수 책정
 				let distScoreA = 0;
@@ -691,18 +870,18 @@
 				let timeScoreB = calcTimeScore(b.reserve_times, minTime);
 				
 				// 총 점수 책정 (나중에 점수 별 비중치 필요 시 해당 부분에서 지급)
-				let totalScoreA = wantedScoreA + distScoreA + ratingScoreA + timeScoreA;
-				let totalScoreB = wantedScoreB + distScoreB + ratingScoreB + timeScoreB;
+				let totalScoreA = distScoreA + ratingScoreA + timeScoreA;
+				let totalScoreB = distScoreB + ratingScoreB + timeScoreB;
 				
 				a.totalScore = totalScoreA;
 				b.totalScore = totalScoreB;
 				
-				// 1차 정렬: 점수 내림차순
+				// 2차 정렬: 점수 내림차순
 				if (totalScoreA !== totalScoreB) {
 					return totalScoreB - totalScoreA;
 				}
 
-				// 2차 정렬: rating 내림차순 (총 점수 같으면 rating 내림차순으로)
+				// 3차 정렬: rating 내림차순 (총 점수 같으면 rating 내림차순으로)
 				return b.rating - a.rating;
 			});
 		}
@@ -722,8 +901,8 @@
 				
 				// 점심 or 저녁 먹어야 하는 상태라면 간격 추가
 				if (targetData.nextIsLunch) { target += lunchInterval; }
-				if (targetData.nextIsDinner) { target += dinnerInterval; }
-				if (targetData.nextIsLunch == false && targetData.nextIsDinner == false) { target += waitTerm; } // 점심/저녁 시간 아닐 경우에는 최소 대기 시간 추가
+				else if (targetData.nextIsDinner) { target += dinnerInterval; }
+				else { target += waitTerm; } // 점심/저녁 시간 아닐 경우에는 최소 대기 시간 추가
 				
 				// reserve_times 배열 내의 숫자 중에서 target 이하인 숫자만 유지
 				data.reserve_times = data.reserve_times.filter(time => time >= target);
@@ -750,6 +929,9 @@
 			for (let i = 0; i < arr.length; i++) {
 				const data = arr[i];
 				
+				// 선호 테마 존재하는 상황에서는 우선 선호 테마만 Pick
+				if (wantedList.length > 0 && data.wanted != true) { continue; }
+				
 				// 해당 데이터 선택 시 endtime을 오버하지 않는지 체크
 				if ((data.reserve_times[0] + data.playtime) < endtime) {
 					
@@ -762,19 +944,22 @@
 						time: data.reserve_times[0],
 						score: data.totalScore,
 						waitInterval: data.reserve_times[0] - targettime,
-						momvingDist: data.movingDist
+						momvingDist: data.movingDist,
+						geoX: data.geoX,
+						geoY: data.geoY,
+						wanted: data.wanted
 					};
 					
 					// 다음 targettime 계산
 					nexttime = data.reserve_times[0] + data.playtime;
 					
 					// 점심 & 저녁 시간 체크 처리
-					if (lunch_flag && lunchStartTime <= nexttime) {
+					if (lunch_flag && lunchStartTime <= nexttime && (lunchStartTime + lunchMaxInterval) >= nexttime) {
 						data.nextIsLunch = true;
 						theme.nextIsLunch = true;
 						lunch_flag = false;
 					}
-					if (dinner_flag && dinnerStartTime <= nexttime) {
+					if (dinner_flag && dinnerStartTime <= nexttime && (dinnerStartTime + dinnerMaxInterval) >= nexttime) {
 						data.nextIsDinner = true;
 						theme.nextIsDinner = true;
 						dinner_flag = false;
@@ -1107,13 +1292,23 @@
 				const start = minutesToHHMM(item.time);
 				const end = minutesToHHMM(item.time + item.playtime);
 
+				log(item);
 				const row = document.createElement("tr");
-				row.innerHTML = '<td>' + order + '</td>' +
+				if (item.wanted == true) {
+					row.innerHTML = '<td>' + order + '</td>' +
+					'<td>' + start + ' ~ ' + end + ' (' + item.playtime + '분)</td>' +
+					'<td style="font-weight: bold; color: blue">' + item.title + '</td>' +
+					'<td>' + item.store + '</td>' +
+					'<td>' + item.rating.toFixed(2) + '</td>' +
+					'<td>' + item.difficulty.toFixed(2) + '</td>';
+				} else {
+					row.innerHTML = '<td>' + order + '</td>' +
 					'<td>' + start + ' ~ ' + end + ' (' + item.playtime + '분)</td>' +
 					'<td>' + item.title + '</td>' +
 					'<td>' + item.store + '</td>' +
 					'<td>' + item.rating.toFixed(2) + '</td>' +
 					'<td>' + item.difficulty.toFixed(2) + '</td>';
+				}
 				table.appendChild(row);
 
 				if (j + 1 < schedule.length) { // 마지막 일정이 아니라면 사이 간격 출력
@@ -1161,7 +1356,7 @@
 					});
 					
 					if (checker.length > 0) {
-						return false;
+						return false;어그오
 					} else {
 						return true;
 					}
@@ -1182,6 +1377,7 @@
 				extractedData.forEach(data => {
 					let nicknameTexts = [];
 					data.nicknames.forEach(nickname => {
+						nickname = String(nickname);
 						nicknameTexts.push(nickname.toLowerCase().replace(removeSpecialCharsAndWhitespace, ''));
 					});
 				
@@ -1229,6 +1425,10 @@
 		
 		function Int(textNum) {
 			return parseInt(textNum, 10);
+		}
+		
+		function log(data) {
+			console.log(data);
 		}
 		
     </script>
