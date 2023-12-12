@@ -60,7 +60,11 @@
 </style>
 </head>
 <body>
-	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J</p>
+	<!-- jQuery 라이브러리를 먼저 로드 -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<!-- UI - 타이틀 -->
+	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v3</p>
 	
 	<!-- UI - 지역 옵션 박스 -->
 	<label for="Area">지역:</label>
@@ -135,6 +139,32 @@
 		<input type="number" id="dinnerInterval" min="0" max="24" value="45" style="width: 40px; text-align: center;">
 		<label>분</label>
 	</div>
+	<br>
+	
+	<label>같이할 사람들의 전방 닉네임을 입력 후 '불러오기' 버튼을 누르세요. (불러온 후 타임테이블을 생성하세요!)</label><br>
+	<label>참여자 중 한명이라도 플레이한 테마들이 Banned List에 불러와집니다.</label><br>
+	<label>※ 코방 사용자 기능 페이지에서 정보 갱신 후 사용 가능합니다. </label><br>
+	<table>
+	  <tr>
+		<td><label>User1 :</label></td>
+		<td><input type="text" id="user_1" style="width: 100px; height: 25px; text-align: center;"></td>
+		<td rowspan="5"><label>Banned List :</label></td>
+		<td rowspan="5"><textarea readonly id="usBannedList" style="width: 350px; height: 110px; font-size: 10px; background-color: lightgray;"></textarea></td>
+	  </tr>
+	  <tr>
+		<td><label>User2 :</label></td>
+		<td><input type="text" id="user_2" style="width: 100px; height: 25px; text-align: center;"></td>
+	  </tr>
+	  <tr>
+		<td><label>User3 :</label></td>
+		<td><input type="text" id="user_3" style="width: 100px; height: 25px; text-align: center;"></td>
+	  </tr>
+	  <tr>
+		<td><label>User4 :</label></td>
+		<td><input type="text" id="user_4" style="width: 100px; height: 25px; text-align: center;"></td>
+	  </tr>
+	</table>
+	<button onclick="SearchData(user_1, user_2, user_3, user_4)" style="width: 100px; height: 30px; text-align: center; font-size: 17px; font-weight: bold;">불러오기</button><br><br>
 	<br>
 	
 	<label>선호 테마 : 여기에 입력한 테마들을 우선 스케줄에 포함시킵니다.</label><br>
@@ -392,6 +422,8 @@
 		let lunchMaxInterval = 210; // lunchStartTime 이후 최대 몇분 이후까지는 점심 먹기를 시작해야 할 지
 		let dinnerMaxInterval = 210; // dinnerStartTime 이후 최대 몇분 이후까지는 저녁 먹기를 시작해야 할 지
 	
+		let usBannedList = [];
+		let totalBannedData = [];
 		let bannedList;
 		let wantedList;
 		let minRating;
@@ -424,19 +456,25 @@
 			if (dayoffset == 0) {
 				startHour = now.getHours();
 				startMinute = now.getMinutes();
-				document.getElementById("startHour").value = startHour;
-				document.getElementById("startMinute").value = startMinute;
 				
 				if(endHour < startHour) {
 					endHour = startHour;
-					document.getElementById("endHour").value = endHour;
-					
 					if(endMinute < startMinute) {
 						endMinute = startMinute;
-						document.getElementById("endMinute").value = endMinute;
 					}
 				}
+			} else {
+				startHour = 10;
+				startMinute = 0;
+				endHour = 23;
+				endMinute = 0;
 			}
+			
+			document.getElementById("startHour").value = startHour;
+			document.getElementById("startMinute").value = startMinute;
+			document.getElementById("endHour").value = endHour;
+			document.getElementById("endMinute").value = endMinute;
+			
 			starttime = ConvertTimeToMinutes(startHour, startMinute);
 			endtime = ConvertTimeToMinutes(endHour, endMinute);
 		}
@@ -463,6 +501,7 @@
 			dinnerInterval  = Int(document.getElementById("dinnerInterval").value);
 			lunch_flag = ori_lunch_flag;
 			dinner_flag = ori_dinner_flag;
+			totalBannedData = [];
 			
 			MainProcess();
 		}
@@ -532,7 +571,7 @@
 				"Origin": "https://bbabang.net",
 				"Referer": "https://bbabang.net/",
 				"Sec-Fetch-Dest": "empty",
-				"Sec-Fetch-Mode": "cors",
+				"Sec-Fetch-Mode": "no-cors",
 				"Sec-Fetch-Site": "cross-site",
 				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
 				"content-type": "application/json",
@@ -653,6 +692,7 @@
 			Promise.all(promises).then(() => {
 				// 추출 완료된 데이터에서 금지 타이틀 제거
 				extractedData = ExtractedDataTitleBannedFilter(extractedData, bannedList);
+				extractedData = ExtractedDataTitleBannedFilter(extractedData, usBannedList);
 				
 				// 추출 완료된 데이터에서 선호 리스트 여부 설정
 				SetWantedList(extractedData, wantedList);
@@ -1272,9 +1312,13 @@
 			extractedData.sort((a, b) => {
 				return b.rating - a.rating;
 			});
+			totalBannedData.sort((a, b) => {
+				return b.rating - a.rating;
+			});
 			
 			// 스케쥴 출력
-			for (let j = 0; j < extractedData.length; j++) {
+			let j = 0;
+			for (; j < extractedData.length; j++) {
 				item = extractedData[j];
 				
 				const row = document.createElement("tr");
@@ -1284,6 +1328,22 @@
 					'<td>' + item.rating.toFixed(2) + '</td>' +
 					'<td>' + item.difficulty.toFixed(2) + '</td>' +
 					'<td>' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</td>';
+				table.appendChild(row);
+			}
+			
+			parseLog(totalBannedData);
+			
+			// 필터링되어 걸러진 테마들 출력
+			for (; j < (extractedData.length + totalBannedData.length); j++) {
+				item = totalBannedData[j - extractedData.length];
+				
+				const row = document.createElement("tr");
+				row.innerHTML = '<td><del style="color: #555;">' + (j+1) + '</td>' +
+					'<td><del style="color: #555;">' + item.title + '</del></td>' +
+					'<td><del style="color: #555;">' + item.store_name + '</del></td>' +
+					'<td><del style="color: #555;">' + item.rating.toFixed(2) + '</del></td>' +
+					'<td><del style="color: #555;">' + item.difficulty.toFixed(2) + '</del></td>' +
+					'<td><del style="color: #555;">' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</del></td>';
 				table.appendChild(row);
 			}
 			
@@ -1375,28 +1435,36 @@
 		
 		// 가공 전 리스트를 받아서 스케쥴에서 제외할 테마 필터링
 		function ExtractedDataTitleBannedFilter(extractedData, bannedList) {
+			if (bannedList.length == 0) { return extractedData; }
+		
 			// 특수 문자 및 공백을 제거하는 정규 표현식
 			const removeSpecialCharsAndWhitespace = /[^a-zA-Z0-9가-힣]/g;
 			
 			let arr = JSON.parse(JSON.stringify(extractedData));
 		
 			for (let i = 0; i < bannedList.length; i++) {
-				let banText = bannedList[i];
+				let banText = bannedList[i];				
 				banText = banText.toLowerCase().replace(removeSpecialCharsAndWhitespace, '');
+				if (banText == '' || banText == ' ' || banText == '	') { continue; }
 				
 				arr = arr.filter(data => {
 					const checker = data.nicknames.filter(nickname => {
+						nickname = String(nickname);
+					
 						// 소문자로 변환하고 특수 문자 및 공백을 제거합니다.
 						const lowerCaseItem = nickname.toLowerCase().replace(removeSpecialCharsAndWhitespace, '');
 						
 						// 부분적으로 일치하는 아이템을 찾습니다.
 						const incResult = lowerCaseItem.includes(banText);
 						
+						if(incResult) { parseLog(banText); }
+						
 						return incResult
 					});
 					
 					if (checker.length > 0) {
-						return false;어그오
+						totalBannedData.push(data);
+						return false;
 					} else {
 						return true;
 					}
@@ -1471,9 +1539,114 @@
 			console.log(data);
 		}
 		
+		function parseLog(data) {
+			console.log(JSON.parse(JSON.stringify(data)));
+		}
     </script>
 	
 	<!-- 응답 데이터를 표시할 요소 -->
 	<pre id="result"></pre>
+	
+	<!-- 이 부분이 검색 루틴 조회 - SearchData 함수 호출시 조회할 사람 입력 하면됨 -->
+	<!-- 웹서버가 아닌 로컬 HTML 제한을 넘어서기 위해서는 최초 https://cors-anywhere.herokuapp.com/corsdemo 에서 등록 절차를 진행해야함 -->
+	<!-- fetch(url, {		 -->
+			<!-- mode: 'no-cors' -->
+		<!-- }) -->
+	<script>
+	function tableToJson(table) {
+		const data = [];
+		const headers = [];
+
+		// 테이블 헤더 추출
+		for (let i = 0; i < table.rows[0].cells.length; i++) {
+		  headers[i] = table.rows[0].cells[i].textContent.toLowerCase();
+		}
+		
+		const manCnt = headers.length - 2;
+
+		var storeName = "";
+		// 테이블 데이터 추출
+		for (let i = 1; i < table.rows.length; i++) {
+		  const row = table.rows[i];
+		  const rowData = {};
+		  
+		  if (row.cells.length == (2 + manCnt)){
+			storeName = row.cells[0].textContent;
+			for (let j = 0; j < row.cells.length; j++) {
+				rowData[headers[j]] = row.cells[j].textContent;
+			}
+		  } else {						  
+				rowData[headers[0]] = storeName;
+			for (let j = 0; j < row.cells.length; j++) {
+				rowData[headers[j + 1]] = row.cells[j].textContent;
+			}						  
+		  }
+
+		  data.push(rowData);
+		}
+
+		return data;
+	}
+	
+	function SearchData() {
+		let name1 = document.getElementById("user_1").value;
+		let name2 = document.getElementById("user_2").value;
+		let name3 = document.getElementById("user_3").value;
+		let name4 = document.getElementById("user_4").value;
+		
+		let usBannedBox = document.getElementById("usBannedList");
+	
+		let arr = [];
+	
+		if (name1 !== '') { name1 = name1.toLowerCase(); }
+		if (name2 !== '') { name2 = name2.toLowerCase(); }
+		if (name3 !== '') { name3 = name3.toLowerCase(); }
+		if (name4 !== '') { name4 = name4.toLowerCase(); }
+		log(name1 + " / " + name2 + " / " + name3 + " / " + name4);
+		const url = 'https://colory.mooo.com/playable?'
+		.concat('name1=', name1, '&')
+		.concat('name2=', name2, '&')
+		.concat('name3=', name3, '&')
+		.concat('name4=', name4)
+		fetch('https://cors-anywhere.herokuapp.com/' + url)
+		  .then(response => response.text())
+		  .then(html => {
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(html, 'text/html');
+				
+				// 테이블 추출
+				const tables = doc.querySelectorAll('table');
+				Array.from(tables).forEach((table, index) => {
+					// 최종 Josn 데이터...
+					const jsonData = tableToJson(table);					
+					//console.log(jsonData);
+					const conditionMet = jsonData.filter(row => {
+						if (name1 !== '') { if (row[name1] === name1) { return true; } }
+						if (name2 !== '') { if (row[name2] === name2) { return true; } }
+						if (name3 !== '') { if (row[name3] === name3) { return true; } }
+						if (name4 !== '') { if (row[name4] === name4) { return true; } }
+						
+						return false;
+					})
+					conditionMet.forEach(data => {
+						const themeName = data['테마'];
+						if (themeName !== '' && themeName !== undefined) { arr.push(themeName); }
+					})
+				});
+				
+				if(arr.length > 0) {
+					arr = arr.map((item) => {
+						return item.replace(/\([^)]+\)/, '').trim();
+					});
+				}
+				
+				usBannedBox.value = "(총 " + arr.length + "개) " + arr;
+				usBannedList = arr;
+		  })
+		  .catch(error => {
+			console.error('Error fetching data:', error)			
+		  });
+	}
+	</script>
 </body>
 </html>
