@@ -64,7 +64,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 	<!-- UI - 타이틀 -->
-	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v3</p>
+	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v4</p>
 	
 	<!-- UI - 지역 옵션 박스 -->
 	<label for="Area">지역:</label>
@@ -1596,6 +1596,7 @@
 		
 		let usBannedBox = document.getElementById("usBannedList");
 		
+		//fetch(url, headers)
 		//fetch('https://cors-anywhere.herokuapp.com/' + url, headers)
 	
 		let arr = [];
@@ -1611,11 +1612,13 @@
 		.concat('name3=', name3, '&')
 		.concat('name4=', name4)
 		const headers = {
-			"method": 'GET',
+		  method: 'GET',
+		  headers: {
 			"Referer": url,
-			"Origin": 'https://colory.mooo.com/',
-			"mode": 'no-cors'
-		}
+			"Origin": 'https://colory.mooo.com/'
+		  },
+		  mode: 'no-cors'
+		};
 		
 		fetch(url, headers)
 		  .then(response => response.text())
