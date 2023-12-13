@@ -1595,6 +1595,11 @@
 		let name4 = document.getElementById("user_4").value;
 		
 		let usBannedBox = document.getElementById("usBannedList");
+		
+		const headers = {
+			"Accept": "*/*",
+			"referrerPolicy": 'unsafe-url'
+		}
 	
 		let arr = [];
 	
@@ -1608,7 +1613,7 @@
 		.concat('name2=', name2, '&')
 		.concat('name3=', name3, '&')
 		.concat('name4=', name4)
-		fetch('https://cors-anywhere.herokuapp.com/' + url)
+		fetch('https://cors-anywhere.herokuapp.com/' + url, headers)
 		  .then(response => response.text())
 		  .then(html => {
 				const parser = new DOMParser();
