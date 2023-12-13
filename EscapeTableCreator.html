@@ -64,7 +64,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 	<!-- UI - 타이틀 -->
-	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v4</p>
+	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v3</p>
 	
 	<!-- UI - 지역 옵션 박스 -->
 	<label for="Area">지역:</label>
@@ -1597,30 +1597,23 @@
 		let usBannedBox = document.getElementById("usBannedList");
 		
 		//fetch(url, headers)
-		//fetch('https://cors-anywhere.herokuapp.com/' + url, headers)
+		//fetch('https://cors-anywhere.herokuapp.com/' + url)
 	
 		let arr = [];
-	
 		if (name1 !== '') { name1 = name1.toLowerCase(); }
 		if (name2 !== '') { name2 = name2.toLowerCase(); }
 		if (name3 !== '') { name3 = name3.toLowerCase(); }
 		if (name4 !== '') { name4 = name4.toLowerCase(); }
 		log(name1 + " / " + name2 + " / " + name3 + " / " + name4);
-		const url = 'https://colory.mooo.com/playable?'
+		const url = '?'
 		.concat('name1=', name1, '&')
 		.concat('name2=', name2, '&')
 		.concat('name3=', name3, '&')
 		.concat('name4=', name4)
-		const headers = {
-		  method: 'GET',
-		  headers: {
-			"Referer": url,
-			"Origin": 'https://colory.mooo.com/'
-		  },
-		  mode: 'no-cors'
-		};
 		
-		fetch(url, headers)
+		parseLog(url);
+		
+		fetch('https://escapeproxy-408004.du.r.appspot.com/playable' + url)
 		  .then(response => response.text())
 		  .then(html => {
 				const parser = new DOMParser();
@@ -1640,6 +1633,9 @@
 						
 						return false;
 					})
+					
+					parseLog(conditionMet);
+					
 					conditionMet.forEach(data => {
 						const themeName = data['테마'];
 						if (themeName !== '' && themeName !== undefined) { arr.push(themeName); }
