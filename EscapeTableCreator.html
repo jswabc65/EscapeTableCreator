@@ -442,15 +442,19 @@
 		let dinnerInterval;
 		let lunch_flag;
 		let dinner_flag;
-		
+		let startHour;
+		let startMinute;
+		let endHour;
+		let endMinute;
+				
 		UpdateDate();
 		
 		function UpdateDate() {
 			dayoffset = CalcOffsetDay(document.getElementById("dateSelect").value);
-			let startHour = Int(document.getElementById("startHour").value);
-			let startMinute = Int(document.getElementById("startMinute").value);
-			let endHour = Int(document.getElementById("endHour").value);
-			let endMinute = Int(document.getElementById("endMinute").value);
+			startHour = Int(document.getElementById("startHour").value);
+			startMinute = Int(document.getElementById("startMinute").value);
+			endHour = Int(document.getElementById("endHour").value);
+			endMinute = Int(document.getElementById("endMinute").value);
 			
 			let now = new Date();
 			
@@ -475,9 +479,6 @@
 			document.getElementById("startMinute").value = startMinute;
 			document.getElementById("endHour").value = endHour;
 			document.getElementById("endMinute").value = endMinute;
-			
-			starttime = ConvertTimeToMinutes(startHour, startMinute);
-			endtime = ConvertTimeToMinutes(endHour, endMinute);
 		}
 		
 		function Start() {
@@ -494,6 +495,12 @@
 			maxRating = Int(document.getElementById("maxRating").value);
 			minDiff = Int(document.getElementById("minDiff").value);
 			maxDiff = Int(document.getElementById("maxDiff").value);
+			startHour = Int(document.getElementById("startHour").value);
+			startMinute = Int(document.getElementById("startMinute").value);
+			endHour = Int(document.getElementById("endHour").value);
+			endMinute = Int(document.getElementById("endMinute").value);
+			starttime = ConvertTimeToMinutes(startHour, startMinute);
+			endtime = ConvertTimeToMinutes(endHour, endMinute);
 			ori_lunch_flag = document.getElementById("lunchChk").checked;
 			lunchStartTime = ConvertTimeToMinutes(document.getElementById("lunchHour").value, document.getElementById("lunchMinute").value);
 			lunchInterval  = Int(document.getElementById("lunchInterval").value);
@@ -504,10 +511,13 @@
 			dinner_flag = ori_dinner_flag;
 			totalBannedData = [];
 			
+			log(startHour, startMinute);
+			
 			MainProcess();
 		}
 		
 		function MainProcess() {
+			
 			const url = "https://q.keigon.net/indexes/qrooms/search";
 			let payload = {
 			  "q": "",
@@ -1332,8 +1342,6 @@
 				table.appendChild(row);
 			}
 			
-			parseLog(totalBannedData);
-			
 			// 필터링되어 걸러진 테마들 출력
 			for (; j < (extractedData.length + totalBannedData.length); j++) {
 				item = totalBannedData[j - extractedData.length];
@@ -1457,8 +1465,6 @@
 						
 						// 부분적으로 일치하는 아이템을 찾습니다.
 						const incResult = lowerCaseItem.includes(banText);
-						
-						if(incResult) { parseLog(banText); }
 						
 						return incResult
 					});
@@ -1605,14 +1611,11 @@
 		if (name2 !== '') { name2 = name2.toLowerCase(); }
 		if (name3 !== '') { name3 = name3.toLowerCase(); }
 		if (name4 !== '') { name4 = name4.toLowerCase(); }
-		log(name1 + " / " + name2 + " / " + name3 + " / " + name4);
 		const url = '?'
 		.concat('name1=', name1, '&')
 		.concat('name2=', name2, '&')
 		.concat('name3=', name3, '&')
 		.concat('name4=', name4)
-		
-		parseLog(url);
 		
 		fetch('https://escapeproxy-408004.du.r.appspot.com/playable' + url)
 		  .then(response => response.text())
@@ -1625,7 +1628,6 @@
 				Array.from(tables).forEach((table, index) => {
 					// 최종 Josn 데이터...
 					const jsonData = tableToJson(table);					
-					//console.log(jsonData);
 					const conditionMet = jsonData.filter(row => {
 						if (name1 !== '') { if (row[name1] === name1) { return true; } }
 						if (name2 !== '') { if (row[name2] === name2) { return true; } }
@@ -1634,8 +1636,6 @@
 						
 						return false;
 					})
-					
-					parseLog(conditionMet);
 					
 					conditionMet.forEach(data => {
 						const themeName = data['테마'];
