@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>연방 생성기</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body {
+			font-size: 16px;
+			margin: 0;
+			padding: 0;
+		}
+
+		p {
+			font-size: 20px;
+			font-weight: bold;
+			text-align: center;
+			margin-top: 10px;
+		}
+
+		label {
+			font-size: 16px;
+		}
+
+		select, input[type="number"], textarea {
+			font-size: 16px;
+			width: 100%;
+			padding: 5px;
+			margin: 5px 0;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+		}
+
+		input[type="checkbox"] {
+			margin-right: 5px;
+		}
+
+		#lunchGroup, #dinnerGroup {
+			display: none;
+		}
+
+		button {
+			width: 100%;
+			height: 50px;
+			text-align: center;
+			font-size: 24px;
+			font-weight: bold;
+			background-color: #007BFF;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+	</style>
+	
+	<style>
+    /* 들여쓰기를 위한 CSS 스타일 */
+    .indented-label {
+        text-indent: 20px; /* 들여쓰기 크기 지정 */
+    }
+</style>
+</head>
+<body>
+	<!-- jQuery 라이브러리를 먼저 로드 -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<!-- UI - 타이틀 -->
+	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v4</p>
+	
+	<!-- UI - 지역 옵션 박스 -->
+	<label for="Area">지역:</label>
+    <select id="Area">
+        <option value="서울">서울</option>
+        <option value="경기/인천">경기/인천</option>
+        <option value="충청">충청</option>
+		<option value="경상">경상</option>
+		<option value="전라">전라</option>
+		<option value="강원">강원</option>
+		<option value="제주">제주</option>
+    </select>
+    <select id="Location">
+       <option value="">지역을 선택하세요</option>
+    </select>
+	<br>
+	
+	<!-- UI - 평점 입력 박스 -->
+	<label>테마 평점 필터 (0~10) :</label>
+		<input type="number" id="minRating" min="0" max="10" value="0" style="width: 40px; text-align: center;">
+		<label> ~ </label>
+		<input type="number" id="maxRating" min="0" max="10" value="10" style="width: 40px; text-align: center;"><br>
+		
+	<!-- UI - 난이도 입력 박스 -->
+	<label>테마 난이도 필터 (0~10) :</label>
+		<input type="number" id="minDiff" min="0" max="10" value="0" style="width: 40px; text-align: center;">
+		<label> ~ </label>
+		<input type="number" id="maxDiff" min="0" max="10" value="10" style="width: 40px; text-align: center;"><br>
+	
+	<!-- UI - 날짜 선택 박스 -->
+	<label for="dateSelect">날짜 선택:</label>
+    <select id="dateSelect">
+        <!-- JavaScript를 사용하여 옵션박스 동적 생성 -->
+    </select>
+	</br>
+	
+	<!-- UI - 시간 입력 박스 -->
+	<label>희망 진행 시간:</label>
+	<input type="number" id="startHour" min="0" max="24" value="10" style="width: 40px; text-align: center;">
+	<label>:</label>
+	<input type="number" id="startMinute" min="0" max="59" value="0" style="width: 40px; text-align: center;">
+	<label> ~ </label>
+	<input type="number" id="endHour" min="0" max="24" value="23" style="width: 40px; text-align: center;">
+	<label>:</label>
+	<input type="number" id="endMinute" min="0" max="59" value="0" style="width: 40px; text-align: center;">
+	<br>
+	
+	<!-- UI - 식사 선택 -->
+    <label for="lunchChk" style="display: flex; align-items: center;">
+	  <input type="checkbox" id="lunchChk" value="true" style="width: 30px; height: 30px;">
+	  <span style="vertical-align: middle;">점심 먹을꺼면 체크</span>
+	</label>
+	<div id="lunchGroup">
+		<label>빠르면 언제 먹을래?:</label>
+		<input type="number" id="lunchHour" min="0" max="24" value="11" style="width: 40px; text-align: center;">
+		<label>:</label>
+		<input type="number" id="lunchMinute" min="0" max="59" value="30" style="width: 40px; text-align: center;"><br>
+		<label>점심 최소 시간 보장:</label>
+		<input type="number" id="lunchInterval" min="0" max="24" value="45" style="width: 40px; text-align: center;">
+		<label>분</label>
+	</div>
+	<label for="dinnerChk" style="display: flex; align-items: center;">
+	  <input type="checkbox" id="dinnerChk" value="true" style="width: 30px; height: 30px;">
+	  <span style="vertical-align: middle;">저녁 먹을꺼면 체크</span>
+	</label>
+	<div id="dinnerGroup">
+		<label>빠르면 언제 먹을래?:</label>
+		<input type="number" id="dinnerHour" min="0" max="24" value="17" style="width: 40px; text-align: center;">
+		<label>:</label>
+		<input type="number" id="dinnerMinute" min="0" max="59" value="30" style="width: 40px; text-align: center;"><br>
+		<label>저녁 최소 시간 보장:</label>
+		<input type="number" id="dinnerInterval" min="0" max="24" value="45" style="width: 40px; text-align: center;">
+		<label>분</label>
+	</div>
+	<br>
+	
+	<label>같이할 사람들의 전방 닉네임을 입력 후 '불러오기' 버튼을 누르세요. (불러온 후 타임테이블을 생성하세요!)</label><br>
+	<label>참여자 중 한명이라도 플레이한 테마들이 Banned List에 불러와집니다.</label><br>
+	<label>※ 코방 사용자 기능 페이지에서 정보 갱신 후 사용 가능합니다. </label><br>
+	<table>
+	  <tr>
+		<td><label>User1 :</label></td>
+		<td><input type="text" id="user_1" style="width: 100px; height: 25px; text-align: center;"></td>
+		<td rowspan="5"><label>Banned List :</label></td>
+		<td rowspan="5"><textarea readonly id="usBannedList" style="width: 350px; height: 110px; font-size: 10px; background-color: lightgray;"></textarea></td>
+	  </tr>
+	  <tr>
+		<td><label>User2 :</label></td>
+		<td><input type="text" id="user_2" style="width: 100px; height: 25px; text-align: center;"></td>
+	  </tr>
+	  <tr>
+		<td><label>User3 :</label></td>
+		<td><input type="text" id="user_3" style="width: 100px; height: 25px; text-align: center;"></td>
+	  </tr>
+	  <tr>
+		<td><label>User4 :</label></td>
+		<td><input type="text" id="user_4" style="width: 100px; height: 25px; text-align: center;"></td>
+	  </tr>
+	</table>
+	<button onclick="SearchData(user_1, user_2, user_3, user_4)" style="width: 100px; height: 30px; text-align: center; font-size: 17px; font-weight: bold;">불러오기</button><br><br>
+	<br>
+	
+	<label>선호 테마 : 여기에 입력한 테마들을 우선 스케줄에 포함시킵니다.</label><br>
+	<label>(콤마 or 슬래쉬 or 줄바꿈을 이용하여 테마 이름을 구분해 주세요)</label><br>
+	<textarea id="wantedList" rows="4" cols="50"></textarea>
+	<br><br>
+	
+	<label>금지 테마 : 여기에 입력한 테마들은 절대 스케줄에 포함되지 않습니다.</label><br>
+	<label>(콤마 or 슬래쉬 or 줄바꿈을 이용하여 테마 이름을 구분해 주세요)</label><br>
+	<textarea id="bannedList" rows="4" cols="50"></textarea>
+	<br><br>
+	
+	<button onclick="Start()" style="width: 350px; height: 50px; text-align: center; font-size: 24px; font-weight: bold;">타임테이블 생성!</button><br><br>
+	
+	<!-- UI - 설명 박스 -->
+	<label style="font-weight: bold; color: red;">※ 연방 생성기는 빠방 데이터를 긁어와서 가공하여 출력해주고 있습니다.</label>
+	<details>
+		<summary>(TMI를 원하신다면) 클릭하여 더 보기... 다시 누르면 접기...</summary>
+		<div>
+			<label style="font-weight: bold;"> ■ 개발 이유</label><br>
+			<label>  - 방탈출에 푹 빠진지 언 2개월(?)...</label><br>
+			<label>  - 한달만에 50방을 맛보게 된 트미J는 서서히 연방 스케쥴을 잡는 것에 지쳐가게 됩니다...</label><br>
+			<label>  - 흑흑, 걍 날짜/지역/원하는 시간만 넣으면 알아서 연방 스케쥴 짜주는 프로그램 없나...?</label><br>
+			<label>  - 빠방에 있는 쩌는 예약 가능 시간 데이터 활용해서 출력해주면 개편할 것 같은데...ㅠ</label><br>
+			<label>  - 그렇게 시작하게 되었죠... html/자바스크립트를 1도 모르는 멍충이 트미J와 똑똑이 ChatGPT의 피말리는 코딩 배틀이...</label><br>
+			<label>  - [트미J] ChatGPT야, 이거 해줘.</label><br>
+			<label>  - [ChatGPT] 네, 요렇게 하심 됨다 ^^</label><br>
+			<label>  - [트미J] 아, 미안 내가 말을 잘못했네, 이렇게 바꿔줘.</label><br>
+			<label>  - [ChatGPT] ㅎ.. 네. 이렇게 하세요. </label><br>
+			<label>  - [트미J] 아, 모르겠다. 그냥 니가 다 짜줘. </label><br>
+			<label>  - [ChatGPT] ㅇㅋ </label><br>
+			<label>  - 그렇게 연방 생성기가 탄생하게 되었습니다.</label><br>
+			<label>  - 제가 방탈출에 진심이 되게 해주신 <span style="font-weight: bold; color: blue;">팀 방진이</span>에게 <span style="font-weight: bold; color: blue;">감사</span>하다는 말씀 전합니다!</label><br>
+			<label>  - 사실 저 같은 파워J가 아니면 굳이 이거 사용할까 싶기는 하지만...ㅠ 그래도 사용해주세요..</label><br><br>
+		</div>
+		
+		<div>
+			<label style="font-weight: bold;"> ■ 기능 설명 </label><br>
+			<label>  - 연방 생성기는 지역/날짜/시작시간/종료시간/평점 필터 및 기타 사항들을 입력 시</label><br>
+			<label>  - 입력한 내용을 바탕으로 빠방에서 예약 가능한 테마 정보들을 긁어와서 적절한 타임테이블을 짜주는 기능을 가지고 있습니다.</label><br>
+			<label>  - 다만, 실제로도 테마 선택 시 평점 외에도 고려하는 사항들이 많기 때문에</label><br>
+			<label>  - 제 경험을 토대로 '평점', '다음 테마까지의 대기시간', '다음 매장까지의 이동거리' 등을 종합적으로 고려하여 테이블을 짜고 있습니다.</label><br>
+			<label>  - 연방 생성기가 짜준 테이블이 마음에 안드시는 분은 페이지 생성 후 제일 하단에 전체 테마 타임테이블을 보시고 직접 짜실 수도 있습니다!</label><br>
+			<label>  - 그리고 점심/저녁 등 식사를 진행하실 계획이시라면 해당 식사에 체크 및 식사를 일찍 먹는다면 언제부터 가능할지, 식사 시간은 몇분을 보장할 것인지 등을 선택하시면 됩니다.</label><br>
+			<label>  - 제일 중요하면서 귀찮은 부분이 아래의 큰 텍스트 박스 영역인데요.</label><br>
+			<label>  - 위쪽 박스는 선호리스트로 해당 리스트에 원하는 테마명을 콤마, 슬래쉬, 줄바꿈 등으로 구분하여 입력해주시면 해당 테마를 우선시하여 스케줄을 잡아드립니다.</label><br>
+			<label>  - 물론, 우선시하는 것일 뿐 반드시 다 잡도록 짜주지는 않습니다. </label><br>
+			<label>  - 아랫쪽 박스는 원하지 않는 테마명을 입력하면 해당 테마들은 절대 스케줄에 포함되지 않습니다. </label><br>
+			<label>  - 사실, 코로리 방탈출의 '우리 모두 안 한 테마'의 정보를 받아와서 닉네임만 넣으면 자동 추가되게 해보려 했으나</label><br>
+			<label>  - 정보 긁어올 방법을 찾지 못해서 실패 했습니다. 그냥 손으로 입력해주세요 흑흑 ㅠㅠ</label><br><br>
+		</div>
+		
+		<div>
+			<label style="font-weight: bold; color: red;"> ■ 주의 사항 </label><br>
+			<label style="color: red;">  - 연방 생성기는 별도의 서버를 지니지 않고, 빠방의 데이터에 의존하는 방식입니다.</label><br>
+			<label style="color: red;">  - 빠방 예약 가능 데이터에 가끔 실제로는 예약이 안되는 건들도 존재하는데, 이는 연방 생성기에도 동일하게 발생합니다.</label><br>
+			<label style="color: red;">  - 따라서, 일정을 정하신 후 반드시 각 매장의 예약 페이지에서 실제 예약이 가능한지 크로스체크를 해보시기 바랍니다.</label><br>
+			<label style="color: red;">  - 빠방 측 요청 or 데이터 긁어오기가 막히게 될 시 서비스가 중지될 수 있습니다. </label><br>
+		</div>
+	</details>
+	
+	<!-- UI 처리용 스크립트 부분 !-->
+	<script>
+        // 옵션1 요소와 옵션2 요소를 가져옴
+        const Area = document.getElementById("Area");
+        const Location = document.getElementById("Location");
+
+        // 옵션1의 선택이 변경될 때 이벤트 처리
+        Area.addEventListener("change", function() {
+            // 선택된 값을 가져옴
+            const selectedValue = Area.value;
+
+            // 옵션2를 업데이트
+            updateLocationBox(selectedValue);
+        });
+
+        // 옵션2를 업데이트하는 함수
+        function updateLocationBox(selectedValue) {
+            // 옵션2 요소를 초기화
+            Location.innerHTML = '';
+
+            // 선택된 값에 따라 옵션2 요소를 설정
+            if (selectedValue === "서울") {
+				Location.appendChild(createOption("홍대"));
+				Location.appendChild(createOption("강남"));
+				Location.appendChild(createOption("건대"));
+				Location.appendChild(createOption("신촌"));
+				Location.appendChild(createOption("대학로"));
+				Location.appendChild(createOption("잠실"));
+				Location.appendChild(createOption("신림"));
+				Location.appendChild(createOption("노원"));
+				Location.appendChild(createOption("수유"));
+				Location.appendChild(createOption("신사"));
+				Location.appendChild(createOption("영등포"));
+				Location.appendChild(createOption("서울대입구"));
+				Location.appendChild(createOption("성신여대"));
+				Location.appendChild(createOption("명동"));
+				Location.appendChild(createOption("천호"));
+				Location.appendChild(createOption("종각"));
+				Location.appendChild(createOption("구로"));
+				Location.appendChild(createOption("용산"));
+				Location.appendChild(createOption("연신내"));
+				Location.appendChild(createOption("동대문"));
+				Location.appendChild(createOption("목동"));
+				Location.appendChild(createOption("노량진"));
+				Location.appendChild(createOption("왕십리"));
+				Location.appendChild(createOption("이수"));
+				Location.appendChild(createOption("문래"));
+				Location.appendChild(createOption("성수"));
+				Location.appendChild(createOption("역삼"));
+			} else if (selectedValue === "경기/인천") {
+				Location.appendChild(createOption("인천"));
+				Location.appendChild(createOption("수원"));
+				Location.appendChild(createOption("성남"));
+				Location.appendChild(createOption("일산"));
+				Location.appendChild(createOption("안산"));
+				Location.appendChild(createOption("부천"));
+				Location.appendChild(createOption("동탄"));
+				Location.appendChild(createOption("의정부"));
+				Location.appendChild(createOption("평택"));
+				Location.appendChild(createOption("안양"));
+				Location.appendChild(createOption("구리"));
+				Location.appendChild(createOption("화정"));
+				Location.appendChild(createOption("김포"));
+				Location.appendChild(createOption("범계"));
+				Location.appendChild(createOption("동두천"));
+				Location.appendChild(createOption("이천"));
+				Location.appendChild(createOption("용인"));
+				Location.appendChild(createOption("화성"));
+				Location.appendChild(createOption("산본"));
+			} else if (selectedValue === "충청") {
+				Location.appendChild(createOption("대전"));
+				Location.appendChild(createOption("천안"));
+				Location.appendChild(createOption("청주"));
+				Location.appendChild(createOption("당진"));
+				Location.appendChild(createOption("세종"));
+			} else if (selectedValue === "경상") {
+				Location.appendChild(createOption("부산"));
+				Location.appendChild(createOption("대구"));
+				Location.appendChild(createOption("울산"));
+				Location.appendChild(createOption("포항"));
+				Location.appendChild(createOption("창원"));
+				Location.appendChild(createOption("진주"));
+				Location.appendChild(createOption("양산"));
+				Location.appendChild(createOption("구미"));
+				Location.appendChild(createOption("경주"));
+				Location.appendChild(createOption("영주"));
+				Location.appendChild(createOption("안동"));
+			} else if (selectedValue === "전라") {
+				Location.appendChild(createOption("광주"));
+				Location.appendChild(createOption("전주"));
+				Location.appendChild(createOption("익산"));
+				Location.appendChild(createOption("여수"));
+				Location.appendChild(createOption("순천"));
+				Location.appendChild(createOption("목포"));
+				Location.appendChild(createOption("군산"));
+			} else if (selectedValue === "강원") {
+				Location.appendChild(createOption("춘천"));
+				Location.appendChild(createOption("원주"));
+				Location.appendChild(createOption("강릉"));
+			} else if (selectedValue === "제주") {
+				Location.appendChild(createOption("제주"));
+			}
+        }
+
+        // 새로운 옵션 요소를 생성하는 함수
+        function createOption(text) {
+            const option = document.createElement("option");
+            option.text = text;
+            return option;
+        }
+
+        // 초기에 옵션 2를 업데이트
+        updateLocationBox(Area.value);
+		
+		// 오늘의 날짜를 얻습니다.
+        const today = new Date();
+        
+        // 옵션박스 요소를 가져옵니다.
+        const dateSelect = document.getElementById("dateSelect");
+        
+        // 7일 동안의 날짜를 계산하고 옵션박스에 추가합니다.
+		for (let i = 0; i < 7; i++) {
+			const currentDate = new Date(today);
+			currentDate.setDate(today.getDate() + i);
+			
+			// 날짜를 YYYY-MM-DD 형식으로 포맷팅합니다.
+			const year = currentDate.getFullYear();
+			const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 1을 더하고 두 자리로 포맷팅
+			const day = currentDate.getDate().toString().padStart(2, '0'); // 날짜를 두 자리로 포맷팅
+			const formattedDate = `${year}-${month}-${day}`;
+			
+			// 요일을 계산합니다.
+			const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+			const dayOfWeek = daysOfWeek[currentDate.getDay()];
+			
+			// 날짜와 요일을 결합하여 옵션 텍스트를 생성합니다.
+			const optionText = `${formattedDate} (${dayOfWeek})`;
+			
+			// 옵션박스에 옵션을 추가합니다.
+			dateSelect.appendChild(createOption(optionText));
+		}
+		
+		// 날짜 선택이 변경될 때 이벤트 처리
+        dateSelect.addEventListener("change", function() {
+            UpdateDate();
+        });
+		
+		// 체크박스 요소를 가져옵니다.
+		const lunchChk = document.getElementById("lunchChk");
+		const dinnerChk = document.getElementById("dinnerChk");
+
+		// 그룹화된 UI 요소들을 가져옵니다.
+		const lunchGroup = document.getElementById("lunchGroup");
+		const dinnerGroup = document.getElementById("dinnerGroup");
+
+		// 체크박스의 상태가 변경될 때 이벤트 리스너를 추가합니다.
+		lunchChk.addEventListener("change", function() {
+			// 체크박스가 체크된 경우 그룹화된 UI 요소들을 보이도록 설정합니다.
+			if (lunchChk.checked) {
+				lunchGroup.style.display = "block"; // 또는 "inline" 또는 "inline-block" 등
+			} else {
+				// 체크박스가 체크되지 않은 경우 그룹화된 UI 요소들을 숨깁니다.
+				lunchGroup.style.display = "none";
+			}
+		});
+		dinnerChk.addEventListener("change", function() {
+			// 체크박스가 체크된 경우 그룹화된 UI 요소들을 보이도록 설정합니다.
+			if (dinnerChk.checked) {
+				dinnerGroup.style.display = "block"; // 또는 "inline" 또는 "inline-block" 등
+			} else {
+				// 체크박스가 체크되지 않은 경우 그룹화된 UI 요소들을 숨깁니다.
+				dinnerGroup.style.display = "none";
+			}
+		});
+
+		// 초기 상태 설정 (체크박스가 체크되어 있을 경우 그룹화된 UI 요소를 보이도록 설정)
+		if (lunchChk.checked) {
+			lunchGroup.style.display = "block";
+		} else {
+			lunchGroup.style.display = "none";
+		}
+		if (dinnerChk.checked) {
+			dinnerGroup.style.display = "block";
+		} else {
+			dinnerGroup.style.display = "none";
+		}
+    </script>
+
+    <!-- 실제 내부 동작 스크립트 -->
+    <script>
+		// 사전 세팅 값
+		const waitTerm = 10 // 테마 후 다음 테마까지 최소 대기 시간
+		const movingTimePerMeter = 0.21 // 테마 후 다른 매장으로 이동 시 1M 거리 당 추가 발생 시간 기준 값
+		let lunchMaxInterval = 210; // lunchStartTime 이후 최대 몇분 이후까지는 점심 먹기를 시작해야 할 지
+		let dinnerMaxInterval = 210; // dinnerStartTime 이후 최대 몇분 이후까지는 저녁 먹기를 시작해야 할 지
+	
+		let usBannedList = [];
+		let totalBannedData = [];
+		let bannedList;
+		let wantedList;
+		let minRating;
+		let maxRating;
+		let minDiff;
+		let maxDiff;
+		let dayoffset;
+		let starttime;
+		let endtime;
+		let ori_lunch_flag;
+		let lunchStartTime;
+		let lunchInterval;
+		let ori_dinner_flag;
+		let dinnerStartTime;
+		let dinnerInterval;
+		let lunch_flag;
+		let dinner_flag;
+		
+		UpdateDate();
+		
+		function UpdateDate() {
+			dayoffset = CalcOffsetDay(document.getElementById("dateSelect").value);
+			let startHour = Int(document.getElementById("startHour").value);
+			let startMinute = Int(document.getElementById("startMinute").value);
+			let endHour = Int(document.getElementById("endHour").value);
+			let endMinute = Int(document.getElementById("endMinute").value);
+			
+			let now = new Date();
+			
+			if (dayoffset == 0) {
+				startHour = now.getHours();
+				startMinute = now.getMinutes();
+				
+				if(endHour < startHour) {
+					endHour = startHour;
+					if(endMinute < startMinute) {
+						endMinute = startMinute;
+					}
+				}
+			} else {
+				startHour = 10;
+				startMinute = 0;
+				endHour = 23;
+				endMinute = 0;
+			}
+			
+			document.getElementById("startHour").value = startHour;
+			document.getElementById("startMinute").value = startMinute;
+			document.getElementById("endHour").value = endHour;
+			document.getElementById("endMinute").value = endMinute;
+			
+			starttime = ConvertTimeToMinutes(startHour, startMinute);
+			endtime = ConvertTimeToMinutes(endHour, endMinute);
+		}
+		
+		function Start() {
+			// 사용자 입력 값
+			userArea = document.getElementById("Area").value;
+			userLocation = document.getElementById("Location").value;
+			bannedList = document.getElementById("bannedList").value;
+			bannedList = bannedList.split(/[,/\n]+/);
+			if(bannedList[0] == '') { bannedList = []; }
+			wantedList = document.getElementById("wantedList").value;
+			wantedList = wantedList.split(/[,/\n]+/);
+			if(wantedList[0] == '') { wantedList = []; }
+			minRating = Int(document.getElementById("minRating").value);
+			maxRating = Int(document.getElementById("maxRating").value);
+			minDiff = Int(document.getElementById("minDiff").value);
+			maxDiff = Int(document.getElementById("maxDiff").value);
+			ori_lunch_flag = document.getElementById("lunchChk").checked;
+			lunchStartTime = ConvertTimeToMinutes(document.getElementById("lunchHour").value, document.getElementById("lunchMinute").value);
+			lunchInterval  = Int(document.getElementById("lunchInterval").value);
+			ori_dinner_flag = document.getElementById("dinnerChk").checked;
+			dinnerStartTime = ConvertTimeToMinutes(document.getElementById("dinnerHour").value, document.getElementById("dinnerMinute").value);
+			dinnerInterval  = Int(document.getElementById("dinnerInterval").value);
+			lunch_flag = ori_lunch_flag;
+			dinner_flag = ori_dinner_flag;
+			totalBannedData = [];
+			
+			MainProcess();
+		}
+		
+		function MainProcess() {
+			const url = "https://q.keigon.net/indexes/qrooms/search";
+			let payload = {
+			  "q": "",
+			  // 나머지 페이로드 데이터 추가
+			  "limit": 20,
+			  "offset": 0,
+			  "filter": [
+				"isopen != false",
+				"store_isopen != false"
+			  ],
+			  "sort": ["isRecommendedTotal:desc"]
+			};
+			
+			// D-기간에 따라 요청 값 변경
+			switch (dayoffset) {
+			  case 0:
+				payload.filter.push(`reserve_times_d0 != ""`);
+				payload.filter.push(`reserve_times_int_d0 >= ${starttime}`);
+				break;
+			  case 1:
+				payload.filter.push(`reserve_times_d1 != ""`);
+				payload.filter.push(`reserve_times_int_d1 >= ${starttime}`);
+				break;
+			  case 2:
+				payload.filter.push(`reserve_times_d2 != ""`);
+				payload.filter.push(`reserve_times_int_d2 >= ${starttime}`);
+				break;
+			  case 3:
+				payload.filter.push(`reserve_times_d3 != ""`);
+				payload.filter.push(`reserve_times_int_d3 >= ${starttime}`);
+				break;
+			  case 4:
+				payload.filter.push(`reserve_times_d4 != ""`);
+				payload.filter.push(`reserve_times_int_d4 >= ${endtime}`);
+				break;
+			  case 5:
+				payload.filter.push(`reserve_times_d5 != ""`);
+				payload.filter.push(`reserve_times_int_d5 >= ${starttime}`);
+				break;
+			  case 6:
+				payload.filter.push(`reserve_times_d6 != ""`);
+				payload.filter.push(`reserve_times_int_d6 >= ${starttime}`);
+				break;
+			}
+			
+			// 사용자 입력에 따라 area와 location 필드 설정
+			if (userArea) {
+			  payload.filter.push(`area = "${userArea}"`);
+			}
+			if (userLocation) {
+			  payload.filter.push(`location = "${userLocation}"`);
+			}
+
+			const headers = {
+				"Accept": "*/*",
+				"Accept-Encoding": "gzip, deflate, br",
+				"Accept-Language": "ko,en-US;q=0.9,en;q=0.8,ja;q=0.7",
+				"Authorization": "Bearer F3WdGD8S3783e99ba7d4508fa06c0dc6d1822e2bd73b87bfe2dd204eae14eb34220cda75",
+				"Connection": "keep-alive",
+				"Content-Length": JSON.stringify(payload).length,
+				"Host": "q.keigon.net",
+				"Origin": "https://bbabang.net",
+				"Referer": "https://bbabang.net/",
+				"Sec-Fetch-Dest": "empty",
+				"Sec-Fetch-Mode": "no-cors",
+				"Sec-Fetch-Site": "cross-site",
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+				"content-type": "application/json",
+				"sec-ch-ua": "\"Google Chrome\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"",
+				"sec-ch-ua-mobile": "?0",
+				"sec-ch-ua-platform": "\"Windows\""
+			};
+
+			let requestOptions = {
+			  method: "POST",
+			  headers: headers,
+			  body: JSON.stringify(payload)
+			};
+			
+			// 빠방에서 받아온 데이터들을 합칠 배열 추가
+			let extractedData = [];
+			let promises = [];
+			let stop_flag = false;
+			for(let z = 0; z < 10; z++) { // 한번에 20개씩 최대 200개까지 데이터 받아오기
+				if (stop_flag == true) { break; }
+			
+				if (z > 0) { // 첫 데이터는 offset 그대로 유지
+					payload.offset += 20;
+					requestOptions.body = JSON.stringify(payload);
+				}
+				
+				// fetch 호출을 promises 배열에 추가
+				promises.push(fetch(url, requestOptions)
+					.then(response => response.json())
+					.then(data => {
+						if (data.hits.length > 0) {
+							let hitsData = data.hits.map(hit => {
+								// dayoffset 값에 따라 reserveTimes 선택
+								let reserveTimes;
+								switch (dayoffset) {
+								  case 0:
+									reserveTimes = hit.reserve_times_int_d0;
+									break;
+								  case 1:
+									reserveTimes = hit.reserve_times_int_d1;
+									break;
+								  case 2:
+									reserveTimes = hit.reserve_times_int_d2;
+									break;
+								  case 3:
+									reserveTimes = hit.reserve_times_int_d3;
+									break;
+								  case 4:
+									reserveTimes = hit.reserve_times_int_d4;
+									break;
+								  case 5:
+									reserveTimes = hit.reserve_times_int_d5;
+									break;
+								  case 6:
+									reserveTimes = hit.reserve_times_int_d6;
+									break;
+								  default:
+									reserveTimes = [];
+								}
+								
+								reserveTimes = reserveTimes.filter(time => time >= starttime);
+								reserveTimes = reserveTimes.filter(time => time <= endtime);
+								
+								// 폐업 예정 테마는 리스트에서 제거
+								if (hit.special_tags.includes("폐업예정") || hit.store_special_tags.includes("폐업예정")) {
+									return null;
+								}
+								
+								// 평점이 minRating 미만이거나 maxRating 초과면 제거 (흙길 하고 싶은 사람을 위한 max 필터...)
+								if ((hit.recommendTotalRating * 10) < minRating) {
+									return null;
+								} else if ((hit.recommendTotalRating * 10) > maxRating) {
+									return null;
+								}
+								
+								// 난이도가 minDiff 미만이거나 maxDiff 초과면 제거 (쉬운것만 or 어려운것만 원하는 사람을 위한 필터...)
+								if ((hit.difficultyTotalRating * 2) < minDiff) {
+									return null;
+								} else if ((hit.difficultyTotalRating * 2) > maxDiff) {
+									return null;
+								}
+								
+								if (reserveTimes.length > 0) {
+									hit.nicknames.push(hit.title);
+									return {
+										title: hit.title,
+										nicknames: hit.nicknames,
+										store_name: hit.store_name,
+										geoX: hit._geo.lat,
+										geoY: hit._geo.lng,
+										rating: hit.recommendTotalRating * 10,
+										difficulty: hit.difficultyTotalRating * 2,
+										playtime: hit.playtime,
+										reserve_times: reserveTimes
+									}
+								} else {
+									return null;
+								}
+							});
+							
+							// 각 테마들 돌면서 extractedData에 넣기
+							hitsData.forEach(hit => {
+								if (hit !== null) {
+									extractedData.push(hit);
+								}
+							});
+							
+							if (data.hits.length < 20) { // 받아온 테마가 20개 미만이면 더 이상 받아올 게 없으므로 종료
+								stop_flag = true;
+							} else { // 더 이상 받아올 테마 없으면 종료
+								stop_flag = true;
+							}
+						}
+					}));
+			}
+			
+			// 모든 Promise가 완료될 때까지 기다린 후에 데이터를 가공
+			Promise.all(promises).then(() => {
+				// 추출 완료된 데이터에서 금지 타이틀 제거
+				extractedData = ExtractedDataTitleBannedFilter(extractedData, bannedList);
+				extractedData = ExtractedDataTitleBannedFilter(extractedData, usBannedList);
+				
+				// 추출 완료된 데이터에서 선호 리스트 여부 설정
+				SetWantedList(extractedData, wantedList);
+				
+				// extractedData 배열을 점수순으로 정렬
+				DataSort(extractedData, -1, -1)
+				
+				// 결과를 저장할 배열 초기화
+				const schedules = [];
+				
+				for (let p = 0; p < extractedData.length; p++) {
+				
+					lunch_flag = ori_lunch_flag;
+					dinner_flag = ori_dinner_flag;
+					
+					// 선호 테마들이 있는 경우에는 선호 테마만 스타팅 테마가 되게 처리
+					if (wantedList.length > 0 && extractedData[p].wanted != true) {
+						continue;
+					}
+				
+					// 추출한 데이터를 스케쥴 가공용으로 복제
+					let copyData = JSON.parse(JSON.stringify(extractedData));
+						
+					// 점수 순으로 정렬했지만, 매번 다른 테이블을 만들기 위해, 최초 테마는 각각 한번씩 돌려봄.
+					if (p != 0) {
+						moveElementToFront(copyData, p);
+					}
+					
+					// 선택된 스케쥴을 데이터를 담을 배열 초기화
+					let schedule = [];
+					
+					// 시작 시간을 nextTargetTime에 초기화
+					let nextTargetTime = starttime;
+					
+					// 모든 테마 돌면서 다음 스케쥴 체크
+					while (nextTargetTime >= 0 && nextTargetTime < endtime) {
+						nextTargetTime = PickFirstData(copyData, schedule, nextTargetTime);
+					}
+					
+					// 선호 테마가 존재하는 경우에는 중간에 빈 타임에 다시 다른 테마들 끼워넣을 수 있게끔 추가 스케줄 체킹
+					if (wantedList.length > 0 && schedule.length > 0) {
+						// 시간 다시 체크해야 하므로 copyData 재복제
+						copyData = JSON.parse(JSON.stringify(extractedData));
+						
+						// 선호 테마를 제외한 테마들을 끼워 넣으므로 선호테마는 빠지도록 필터링
+						copyData = copyData.filter(data => {
+							if (data.wanted != true) { return true; }
+							else { return false; }
+						})
+						
+						// 중간 채워넣기 함수 실행
+						FillMidSchedule(copyData, schedule);
+					}
+					
+					schedules.push(schedule);
+				}
+
+				// 응답 데이터를 가공하고 화면에 출력
+				const resultElement = document.getElementById("result");
+
+				// 추출한 데이터를 출력
+				PrintSchedules(schedules, extractedData, resultElement);
+			});
+		}
+		
+		// 선호 리스트로 스케쥴 생성 후 중간 비는 시간에 스케쥴 채워넣는 함수
+		function FillMidSchedule(copyData, schedule) {
+			for (let i = 0; i <= schedule.length; i++) {
+				let afterData = [];
+				let waitInterval = 0
+				let midStartTime = starttime;
+				let midEndTime = endtime;
+				let beforeGeoX = -1;
+				let beforeGeoY = -1;
+				let afterGeoX = -1;
+				let afterGeoY = -1;
+				let beforeData = [];
+				
+				if (i < schedule.length) {	// 막순서 스케쥴 체크가 아니라면
+					afterData = schedule[i];
+					waitInterval = afterData.waitInterval; // 이전 타임과 현재 선택된 스케쥴 사이에 대기 시간이 얼마나 있는지 체크
+					midStartTime = afterData.time - waitInterval;
+					midEndTime = afterData.time;
+					
+					// after 좌표 갱신
+					afterGeoX = afterData.geoX;
+					afterGeoY = afterData.geoY;
+				} else {	// 막순서라면
+					midStartTime = schedule[i-1].time + schedule[i-1].playtime;
+				}
+				
+				// 중간에 채워놓을 시간의 가능한 StartTime 구하기
+				// 첫번째 스케쥴이 아닌 경우
+				if (i > 0) {
+					beforeData = schedule[i-1];
+				
+					// 이전 테마 끝나고 식사 시간인지 확인
+					if (beforeData.nextIsLunch == true) {	// 점심 시간이면 최소 시간 보장
+						midStartTime += lunchInterval;
+					} else if (beforeData.nextIsDinner == true) {	// 저녁 시간이면 최소 시간 보장
+						midStartTime += dinnerInterval;
+					} else {	// 점심,저녁 아니면 기본 waitTerm 보장
+						midStartTime += waitTerm;
+					}
+					
+					// before 좌표 갱신
+					beforeGeoX = beforeData.geoX;
+					beforeGeoY = beforeData.geoY;
+				}
+				
+				// copyData 다시 재복제
+				let anotherData = JSON.parse(JSON.stringify(copyData));
+				
+				// 각 테마를 돌면서 중간에 채워넣을 수 있는 시간만 필터링
+				for (let j = 0; j < anotherData.length; j++) {
+					let data = anotherData[j];
+					
+					// 이전 테마 매장으로부터 현 테마 매장으로까지 이동 거리에 따른 시간 계산
+					let distTime = 0;
+					if(beforeGeoX > 0 && beforeGeoY > 0) {
+						distTime = calcDist(data.geoX, data.geoY, beforeGeoX, beforeGeoY) * movingTimePerMeter; // 두 매장간의 거리를 계산 후 거리 당 걸리는 시간을 적용하여 필요 시간 산출.
+						distTime = Math.ceil(distTime / 5) * 5; // 필요 시간이 5의 배수로 나올 수 있도록 올림 처리.
+					}
+					
+					// 현 테마 매장에서 다음 테마 매장으로까지 이동 거리에 따른 시간 계산
+					let nextDistTime = 0;
+					if(afterGeoX > 0 && afterGeoY > 0) {
+						nextDistTime = calcDist(data.geoX, data.geoY, afterData.geoX, afterData.geoY) * movingTimePerMeter; // 두 매장간의 거리를 계산 후 거리 당 걸리는 시간을 적용하여 필요 시간 산출.
+						nextDistTime = Math.ceil(distTime / 5) * 5; // 필요 시간이 5의 배수로 나올 수 있도록 올림 처리.
+					}
+					
+					data.reserve_times = data.reserve_times.filter(time => time >= (midStartTime + distTime)); // 시작 시간 필터
+					data.reserve_times = data.reserve_times.filter(time => time <= (midEndTime - (nextDistTime + waitTerm + data.playtime))); // 종료 시간 필터
+					
+					// 만약 reserve_times 배열이 빈 배열이라면 해당 데이터 제거
+					if (data.reserve_times.length == 0) {
+						anotherData.splice(j, 1);
+						j--; // 데이터가 제거되면 인덱스를 하나 줄입니다.
+					}
+				}
+				
+				// 필터링 후 anotherData에 값이 남아있다면 정렬 후 중간에 끼워넣기
+				if (anotherData.length > 0) {
+					// 점수 순으로 정렬
+					DataSort(anotherData, beforeGeoX, beforeGeoY)
+				
+					let calcInterval = starttime;
+					if (i > 0) {
+						calcInterval = schedule[i-1].time + schedule[i-1].playtime;
+					}
+					let theme = {
+						title: anotherData[0].title,
+						store: anotherData[0].store_name,
+						playtime: anotherData[0].playtime,
+						rating: (anotherData[0].rating),
+						difficulty: (anotherData[0].difficulty),
+						time: anotherData[0].reserve_times[0],
+						score: anotherData[0].totalScore,
+						waitInterval: anotherData[0].reserve_times[0] - calcInterval,
+						momvingDist: anotherData[0].movingDist,
+						geoX: anotherData[0].geoX,
+						geoY: anotherData[0].geoY,
+						wanted: anotherData[0].wanted
+					};
+					
+					// 점심 & 저녁 시간 체크 처리
+					if (lunch_flag && lunchStartTime <= (theme.time + theme.playtime) && (theme.time + theme.playtime + lunchInterval) <= midEndTime && (lunchStartTime + lunchMaxInterval) >= (theme.time + theme.playtime)) {
+						theme.nextIsLunch = true;
+						lunch_flag = false;
+					}
+					if (dinner_flag && dinnerStartTime <= (theme.time + theme.playtime) && (theme.time + theme.playtime + dinnerInterval) <= midEndTime && (dinnerStartTime + dinnerMaxInterval) >= (theme.time + theme.playtime)) {
+						theme.nextIsDinner = true;
+						dinner_flag = false;
+					}
+					
+					schedule.splice(i, 0, theme); 
+					
+					// 중간에 테마 끼어넣었다면 다음 테마의 waitInterval / 이전 테마의 movingDist 갱신 필요
+					if (i < schedule.length) {
+						afterData.waitInterval = afterData.time - (theme.time + theme.playtime);
+					}
+					if (i > 0) {
+						beforeData.movingDist = calcDist(theme.geoX, theme.geoY, beforeData.geoX, beforeData.geoY);
+					}
+					
+					// 중간에 테마 끼어넣었다면 해당 테마가 다시 중간에 끼어들지 않게끔 copyData에서 제거 필요
+					copyData = RemoveThemeByTitle(copyData, theme.title);
+				} else {
+					continue;
+				}
+			}
+		}
+		
+		// 배열에서 title이 일치하는 테마를 찾아 제거하는 함수
+		function RemoveThemeByTitle(arr, title) {
+			arr = arr.filter(data => {
+			
+				if (data.title === title) { return false; }
+				else { return true; }
+			
+			});
+			
+			return arr;
+		}
+		
+		// 데이터를 reserve_times의 첫번째 값 기준 오름차순으로 정렬
+		function DataSort(arr, geoX, geoY) {
+			// 직전 테마와의 거리, 평점, 대기 시간 차이 등을 점수화 시키고
+			// 점수 내림차순으로 정렬하고자 함.
+			
+			if (arr.length == 0) { return; }
+			
+			// 사전 처리로 남은 테마들 중 가장 예약 시간이 이른 시간을 확인하여 minTime에 넣기.
+			let minTime = arr[0].reserve_times[0];
+			for (let i = 0; i < arr.length; i++) {
+				let data = arr[i];
+				let dataMin = Math.min(...data.reserve_times);
+				if (dataMin < minTime) {
+					minTime = dataMin;
+				}
+			}
+			
+			// 정렬 처리 시작
+			arr.sort((a, b) => {
+				// 선호 테마일 경우 무조건 우선 정렬
+				let wantedA = 0;
+				let wantedB = 0;
+				if (a.wanted) { wantedA = 1; }
+				if (b.wanted) { wantedB = 1; }
+				
+				// 1차 정렬: 선호 테마 내림차순
+				if (wantedA !== wantedB) {
+					return wantedB - wantedA;
+				}
+			
+				// 거리 점수 책정
+				let distScoreA = 0;
+				let distScoreB = 0;
+				if (geoX != -1 && geoY != -1) { // 최초 정렬일 경우 geoX,Y가 -1로 전달되므로, geoX,Y가 존재할 경우에만 거리 점수 계산
+					let distScoreA = calcGeoDistScore(geoX, geoY, a.geoX, a.geoY);
+					let distScoreB = calcGeoDistScore(geoX, geoY, b.geoX, b.geoY);
+					
+					a.movingDist = calcDist(geoX, geoY, a.geoX, a.geoY);
+					b.movingDist = calcDist(geoX, geoY, b.geoX, b.geoY);
+				} else {
+					a.movingDist = 0;
+					b.movingDist = 0;
+				}
+				
+				// 평점 점수 책정
+				let ratingScoreA = calcRatingScore(a.rating);
+				let ratingScoreB = calcRatingScore(b.rating);
+				
+				// 대기 시간 점수 책정
+				let timeScoreA = calcTimeScore(a.reserve_times, minTime);
+				let timeScoreB = calcTimeScore(b.reserve_times, minTime);
+				
+				// 총 점수 책정 (나중에 점수 별 비중치 필요 시 해당 부분에서 지급)
+				let totalScoreA = distScoreA + ratingScoreA + timeScoreA;
+				let totalScoreB = distScoreB + ratingScoreB + timeScoreB;
+				
+				a.totalScore = totalScoreA;
+				b.totalScore = totalScoreB;
+				
+				// 2차 정렬: 점수 내림차순
+				if (totalScoreA !== totalScoreB) {
+					return totalScoreB - totalScoreA;
+				}
+
+				// 3차 정렬: rating 내림차순 (총 점수 같으면 rating 내림차순으로)
+				return b.rating - a.rating;
+			});
+		}
+		
+		// 데이터의 reserve_times 중 targetData 기준 다음 시간으로 플레이 가능하지 않은 값들은 제거
+		function DataTimeFilter(arr, targetData) {
+			// arr 배열의 각 데이터에 대해 작업 수행
+			for (let i = 0; i < arr.length; i++) {
+				const data = arr[i];
+				
+				// 단순 플레이 시간 외에도, 매장까지의 거리, 테마 간 기본 대기시간 등도 고려하여 테마 별 다음 플레이 가능 시간을 별도로 체크.
+				let target = targetData.reserve_times[0] + targetData.playtime; // 이전 테마의 시작시간 + 플레이타임을 통해 종료 시간을 체크
+				
+				let distTime = calcDist(data.geoX, data.geoY, targetData.geoX, targetData.geoY) * movingTimePerMeter; // 두 매장간의 거리를 계산 후 거리 당 걸리는 시간을 적용하여 필요 시간 산출.
+				distTime = Math.ceil(distTime / 5) * 5; // 필요 시간이 5의 배수로 나올 수 있도록 올림 처리.
+				target += distTime; // 이동 시간 추가.
+				
+				// 점심 or 저녁 먹어야 하는 상태라면 간격 추가
+				if (targetData.nextIsLunch) { target += lunchInterval; }
+				else if (targetData.nextIsDinner) { target += dinnerInterval; }
+				else { target += waitTerm; } // 점심/저녁 시간 아닐 경우에는 최소 대기 시간 추가
+				
+				// reserve_times 배열 내의 숫자 중에서 target 이하인 숫자만 유지
+				data.reserve_times = data.reserve_times.filter(time => time >= target);
+				
+				// 만약 reserve_times 배열이 빈 배열이라면 해당 데이터 제거
+				if (data.reserve_times.length == 0) {
+					arr.splice(i, 1);
+					i--; // 데이터가 제거되면 인덱스를 하나 줄입니다.
+				}
+			}
+			
+			if (arr.length == 0) {
+				return -1;
+			} else {
+				return arr.length;
+			}
+		}
+		
+		// 전달받은 배열의 첫번째 데이터를 추출(스케쥴에 추가 및 배열에서 제거)하고, 다음 targetTime을 반환
+		function PickFirstData(arr, schedule, targettime) {
+			let nexttime = -1 // 반환값 초기화 (-1에서 변동되지 않으면 종료 필요 상태)
+			
+			// arr 배열의 각 데이터에 대해 작업 수행
+			for (let i = 0; i < arr.length; i++) {
+				const data = arr[i];
+				
+				// 선호 테마 존재하는 상황에서는 우선 선호 테마만 Pick
+				if (wantedList.length > 0 && data.wanted != true) { continue; }
+				
+				// 해당 데이터 선택 시 endtime을 오버하지 않는지 체크
+				if ((data.reserve_times[0] + data.playtime) < endtime) {
+					
+					let theme = {
+						title: data.title,
+						store: data.store_name,
+						playtime: data.playtime,
+						rating: (data.rating),
+						difficulty: (data.difficulty),
+						time: data.reserve_times[0],
+						score: data.totalScore,
+						waitInterval: data.reserve_times[0] - targettime,
+						momvingDist: data.movingDist,
+						geoX: data.geoX,
+						geoY: data.geoY,
+						wanted: data.wanted
+					};
+					
+					// 다음 targettime 계산
+					nexttime = data.reserve_times[0] + data.playtime;
+					
+					// 점심 & 저녁 시간 체크 처리
+					if (lunch_flag && lunchStartTime <= nexttime && (lunchStartTime + lunchMaxInterval) >= nexttime) {
+						data.nextIsLunch = true;
+						theme.nextIsLunch = true;
+						lunch_flag = false;
+					}
+					if (dinner_flag && dinnerStartTime <= nexttime && (dinnerStartTime + dinnerMaxInterval) >= nexttime) {
+						data.nextIsDinner = true;
+						theme.nextIsDinner = true;
+						dinner_flag = false;
+					}
+					
+					// 스케쥴에 테마 정보 추가
+					schedule.push(JSON.parse(JSON.stringify(theme)));
+					
+					// 기존 배열에서 선택된 데이터 제거되도록 처리
+					arr.splice(i, 1);
+					
+					// 기존 배열 이전에 선택된 테마 기준으로 가능한 시간만 남기고 재정렬
+					if (DataTimeFilter(arr, data) != -1) { // 데이터 필터링 후 남은 테마가 있다면
+						DataSort(arr, data.geoX, data.geoY);
+					} else { // 데이터 필터링 후 남은 테마가 없다면 빠져나옴.
+						break;
+					}
+					
+					break; // 하나 선택되었으니 바로 빠져나옴.
+					
+				} else {
+					nexttime = -1	// endtime 오버 이슈로 선택하지 못했다면 종료 체크를 위해 -1을 반환
+				}
+			}
+			
+			return nexttime;
+		}
+		
+		// 분(minutes)을 HH:MM 형태로 변환하는 함수
+		function minutesToHHMM(minutes) {
+		  const hours = Math.floor(minutes / 60);
+		  const mins = minutes % 60;
+		  const hh = hours < 10 ? `0${hours}` : hours.toString();
+		  const mm = mins < 10 ? `0${mins}` : mins.toString();
+		  return `${hh}:${mm}`;
+		}
+		
+		// 배열 내 특정 요소를 가장 앞으로 당겨오는 함수
+		function moveElementToFront(arr, index) {
+			if (index >= 0 && index < arr.length) {
+				let element = arr[index]; // 주어진 인덱스의 요소를 가져옵니다.
+				arr.splice(index, 1); // 요소를 배열에서 제거합니다.
+				arr.unshift(element); // 요소를 배열의 맨 앞에 삽입합니다.
+			}
+		}
+		
+		// 위도/경도 좌표 간 거리 계산 함수
+		function calcDist(geoX1, geoY1, geoX2, geoY2) {
+		  const R = 6371; // 지구의 반지름 (미터)
+
+		  // 라디안으로 변환
+		  const geoX1Rad = (geoX1 * Math.PI) / 180;
+		  const geoY1Rad = (geoY1 * Math.PI) / 180;
+		  const geoX2Rad = (geoX2 * Math.PI) / 180;
+		  const geoY2Rad = (geoY2 * Math.PI) / 180;
+
+		  // 위도 및 경도의 차이 계산
+		  const dGeoX = geoX2Rad - geoX1Rad;
+		  const dGeoY = geoY2Rad - geoY1Rad;
+
+		  // Haversine 공식을 사용하여 거리 계산
+		  const a =
+			Math.sin(dGeoX / 2) ** 2 +
+			Math.cos(geoX1Rad) * Math.cos(geoX2Rad) * Math.sin(dGeoY / 2) ** 2;
+		  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+		  // 거리를 미터로 변환하여 반환
+		  const distance = R * c * 1000; // 미터로 변환 (1 킬로미터 = 1000 미터)
+		  return distance;
+		}
+		
+		// 거리 계산해주는 로직
+		function calcGeoDistScore(oriX, oriY, newX, newY) {
+			const distance = calcDist(oriX, oriY, newX, newY);
+			let score = 0;
+			
+			if (distance <= 300) {	// 거리가 300미터 이내이면
+				score = 3;
+			} else if (distance <= 500) {	// 거리가 500미터 이내이면
+				score = 2;
+			} else if (distance <= 700) {	// 거리가 700미터 이내이면
+				score = 1;
+			} else {
+				score = 0;
+			}
+			
+			return score;
+		}
+		
+		// 평점 계산해주는 함수
+		function calcRatingScore(rating) {
+			let score = 0;
+			
+			if (rating >= 8) {	// 평점이 8 이상이면
+				score = 3;
+			} else if (rating >= 6) {	// 평점이 6 이상이면
+				score = 2;
+			} else if (rating >= 5) {	// 평점이 5 이상이면
+				score = 1;
+			} else {
+				score = 0;
+			}
+			
+			return score;
+		}
+		
+		// 대기 시간 점수 계산해주는 함수
+		function calcTimeScore(reserve_times, minTime) {
+			let score = 0;
+			
+			let diffTime = Math.min(...reserve_times) - minTime;
+			if (diffTime <= 15) {	// 가장 이른 시간으로부터의 시간 차이가 15분 이내이면
+				score = 3;
+			} else if (diffTime <= 30) {	// 가장 이른 시간으로부터의 시간 차이가 30분 이내이면
+				score = 2;
+			} else if (diffTime <= 60) {	// 가장 이른 시간으로부터의 시간 차이가 60분 이내이면
+				score = 1;
+			} else {
+				score = 0;
+			}
+			
+			return score;
+		}
+		
+		// 가장 점수가 높은 스케쥴을 찾는 함수
+		function findHighestScoreSchedule(arr) {
+			// arr 배열을 score의 합산 값으로 내림차순 정렬
+			arr.sort((a, b) => {
+				const scoreA = a.reduce((acc, item) => acc + item.score, 0);
+				const scoreB = b.reduce((acc, item) => acc + item.score, 0);
+				return scoreB - scoreA;
+			});
+			
+			if (arr.length > 0) {
+				return arr[0];
+			} else {
+				return null;
+			}
+		}
+		
+		// 평점 평균이 가장 높은 스케쥴을 찾는 함수 (단, 최고 테마 개수 스케쥴 대비 테마 개수가 -2 미만인 스케쥴은 제외)
+		function findHighestAverageRatingSchedule(arr) {
+			// arr 배열을 score의 합산 값으로 내림차순 정렬
+			arr.sort((a, b) => {
+				const totalRatingA = a.reduce((acc, item) => acc + item.rating, 0);
+				const averRatingA = totalRatingA / a.length;
+				
+				const totalRatingB = b.reduce((acc, item) => acc + item.rating, 0);
+				const averRatingB = totalRatingB / b.length;
+			
+				return averRatingB - averRatingA;
+			});
+			
+			// 최고 테마 개수 스케쥴 확인
+			const maxLength = arr.reduce((max, arr) => {
+				return Math.max(max, arr.length);
+			}, 0);
+			
+			// 개수 너무 떨어지는 스케쥴은 제외
+			arr = arr.filter(schedule => schedule.length > (maxLength - 2));
+			
+			if (arr.length > 0) {
+				return arr[0];
+			} else {
+				return null;
+			}
+		}
+		
+		// 대기 시간이 가장 적은 스케쥴을 찾는 함수 (단, 테마 개수 스케쥴 대비 테마 개수가 -2 미만인 스케쥴은 제외)
+		function findLowestWaitIntervalSchedule(arr) {
+			// arr 배열을 score의 합산 값으로 내림차순 정렬
+			arr.sort((a, b) => {
+				const intervalA = a.reduce((acc, item) => acc + item.waitInterval, 0);
+				const intervalB = b.reduce((acc, item) => acc + item.waitInterval, 0);
+				return intervalA - intervalB;
+			});
+			
+			// 최고 테마 개수 스케쥴 확인
+			const maxLength = arr.reduce((max, arr) => {
+				return Math.max(max, arr.length);
+			}, 0);
+			
+			// 개수 너무 떨어지는 스케쥴은 제외
+			arr = arr.filter(schedule => schedule.length > (maxLength - 2));
+			
+			if (arr.length > 0) {
+				return arr[0];
+			} else {
+				return null;
+			}
+		}
+		
+		// 이동 거리가 가장 짧은 스케쥴을 찾는 함수 (단, 최고 테마 개수 스케쥴 대비 테마 개수가 -2 미만인 스케쥴은 제외)
+		function findLowestMovingDistScoreSchedule(arr) {
+			// arr 배열을 score의 합산 값으로 내림차순 정렬
+			arr.sort((a, b) => {
+				const distA = a.reduce((acc, item) => acc + item.movingDist, 0);
+				const distB = b.reduce((acc, item) => acc + item.movingDist, 0);
+				return distA - distB;
+			});
+			
+			// 최고 테마 개수 스케쥴 확인
+			const maxLength = arr.reduce((max, arr) => {
+				return Math.max(max, arr.length);
+			}, 0);
+			
+			// 개수 너무 떨어지는 스케쥴은 제외
+			arr = arr.filter(schedule => schedule.length > (maxLength - 2));
+			
+			if (arr.length > 0) {
+				return arr[0];
+			} else {
+				return null;
+			}
+		}
+		
+		// 화면에 출력해주는 로직
+		function PrintSchedules(schedules, extractedData, resultElement) {
+			// resultElement의 모든 자식 요소 제거
+			while (resultElement.firstChild) {
+				resultElement.removeChild(resultElement.firstChild);
+			}
+		
+			const container = document.createElement("div");
+
+			// 각 스케쥴 출력
+			PrintScheduleToTable(findHighestScoreSchedule(schedules), container, '■ 추천 스케줄');
+			container.appendChild(document.createElement("hr"));
+			container.appendChild(document.createElement("br"));
+
+			PrintScheduleToTable(findHighestAverageRatingSchedule(schedules), container, '■ 높은 평점 스케줄');
+			container.appendChild(document.createElement("hr"));
+			container.appendChild(document.createElement("br"));
+			
+			PrintScheduleToTable(findLowestWaitIntervalSchedule(schedules), container, '■ 낮은 대기시간 스케줄');
+			container.appendChild(document.createElement("hr"));
+			container.appendChild(document.createElement("br"));
+
+			PrintScheduleToTable(findLowestMovingDistScoreSchedule(schedules), container, '■ 낮은 이동거리 스케줄');
+			
+			PrintAllThemeTime(schedules, extractedData, container);
+
+			resultElement.appendChild(container);
+		}
+		
+		// 추천 스케줄 출력 후 모든 테마를 출력해주는 로직
+		function PrintAllThemeTime(schedules, extractedData, container) {
+			if (schedules === null || schedules.length === 0) {
+				return;
+			}
+			
+			// 항목 출력
+			const nameRow = document.createElement("div");
+			const nameCell = document.createElement("h2");
+			nameCell.textContent = "■ 모든 테마 정보";
+			nameRow.appendChild(nameCell);
+			container.appendChild(nameRow);
+			
+			// 표 요소 생성
+			const table = document.createElement("table");
+			table.border = "1"; // 표 경계선 스타일 지정 (선택적)
+			
+			// 헤더 출력
+			const headerRow = document.createElement("tr");
+			headerRow.innerHTML = '<th>No</th><th>테마명</th><th>매장</th><th>평점</th><th>난이도</th><th>예약 가능 테이블</th>';
+			table.appendChild(headerRow);
+			
+			// 평점 내림차순으로 정렬
+			extractedData.sort((a, b) => {
+				return b.rating - a.rating;
+			});
+			totalBannedData.sort((a, b) => {
+				return b.rating - a.rating;
+			});
+			
+			// 스케쥴 출력
+			let j = 0;
+			for (; j < extractedData.length; j++) {
+				item = extractedData[j];
+				
+				const row = document.createElement("tr");
+				row.innerHTML = '<td>' + (j+1) + '</td>' +
+					'<td>' + item.title + '</td>' +
+					'<td>' + item.store_name + '</td>' +
+					'<td>' + item.rating.toFixed(2) + '</td>' +
+					'<td>' + item.difficulty.toFixed(2) + '</td>' +
+					'<td>' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</td>';
+				table.appendChild(row);
+			}
+			
+			parseLog(totalBannedData);
+			
+			// 필터링되어 걸러진 테마들 출력
+			for (; j < (extractedData.length + totalBannedData.length); j++) {
+				item = totalBannedData[j - extractedData.length];
+				
+				const row = document.createElement("tr");
+				row.innerHTML = '<td><del style="color: #555;">' + (j+1) + '</td>' +
+					'<td><del style="color: #555;">' + item.title + '</del></td>' +
+					'<td><del style="color: #555;">' + item.store_name + '</del></td>' +
+					'<td><del style="color: #555;">' + item.rating.toFixed(2) + '</del></td>' +
+					'<td><del style="color: #555;">' + item.difficulty.toFixed(2) + '</del></td>' +
+					'<td><del style="color: #555;">' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</del></td>';
+				table.appendChild(row);
+			}
+			
+			// 표를 컨테이너에 추가
+			container.appendChild(table);
+		}
+
+		// 각 스케쥴을 출력해주기 위한 로직
+		function PrintScheduleToTable(schedule, container, scheduleName) {
+			if (schedule === null || schedule.length === 0) {
+				return;
+			}
+
+			// 스케쥴 이름 출력
+			const nameRow = document.createElement("div");
+			const nameCell = document.createElement("h2");
+			nameCell.textContent = scheduleName;
+			nameRow.appendChild(nameCell);
+			container.appendChild(nameRow);
+			
+			const dateCell = document.createElement("h2");
+			dateCell.textContent = dateSelect.value;
+			container.appendChild(dateCell);
+
+			// 표 요소 생성
+			const table = document.createElement("table");
+			table.border = "1"; // 표 경계선 스타일 지정 (선택적)
+
+			// 헤더 출력
+			const headerRow = document.createElement("tr");
+			headerRow.innerHTML = '<th>순서</th><th>시간</th><th>제목</th><th>가게</th><th>평점</th><th>난이도</th>';
+			table.appendChild(headerRow);
+
+			// 스케쥴 출력
+			for (let j = 0; j < schedule.length; j++) {
+				item = schedule[j];
+
+				let order = '';
+				if (j + 1 === 1) {
+					order = `첫방`;
+				} else if (j + 1 === schedule.length) {
+					order = `${j + 1}연방(막방)`;
+				} else {
+					order = `${j + 1}연방`;
+				}
+
+				const start = minutesToHHMM(item.time);
+				const end = minutesToHHMM(item.time + item.playtime);
+
+				const row = document.createElement("tr");
+				if (item.wanted == true) {
+					row.innerHTML = '<td>' + order + '</td>' +
+					'<td>' + start + ' ~ ' + end + ' (' + item.playtime + '분)</td>' +
+					'<td style="font-weight: bold; color: blue">' + item.title + '</td>' +
+					'<td>' + item.store + '</td>' +
+					'<td>' + item.rating.toFixed(2) + '</td>' +
+					'<td>' + item.difficulty.toFixed(2) + '</td>';
+				} else {
+					row.innerHTML = '<td>' + order + '</td>' +
+					'<td>' + start + ' ~ ' + end + ' (' + item.playtime + '분)</td>' +
+					'<td>' + item.title + '</td>' +
+					'<td>' + item.store + '</td>' +
+					'<td>' + item.rating.toFixed(2) + '</td>' +
+					'<td>' + item.difficulty.toFixed(2) + '</td>';
+				}
+				table.appendChild(row);
+
+				if (j + 1 < schedule.length) { // 마지막 일정이 아니라면 사이 간격 출력
+					const interval = schedule[j + 1].time - (item.time + item.playtime);
+					if (interval > 0) {
+						let intervalText = "";
+						if (item.nextIsLunch) {
+							intervalText = intervalText = '<span style="font-weight: bold; color: blue">(점심 시간 ' + interval + '분)</span>';
+						} else if (item.nextIsDinner) {
+							intervalText = intervalText = '<span style="font-weight: bold; color: blue">(저녁 시간 ' + interval + '분)</span>';
+						} else {
+							intervalText = '(대기 시간 ' + interval + '분)';
+						}
+						const intervalRow = document.createElement("tr");
+						intervalRow.innerHTML = '<td colspan="7">' + intervalText + '</td>';
+						table.appendChild(intervalRow);
+					}
+				}
+			}
+
+			// 표를 컨테이너에 추가
+			container.appendChild(table);
+		}
+		
+		// 가공 전 리스트를 받아서 스케쥴에서 제외할 테마 필터링
+		function ExtractedDataTitleBannedFilter(extractedData, bannedList) {
+			if (bannedList.length == 0) { return extractedData; }
+		
+			// 특수 문자 및 공백을 제거하는 정규 표현식
+			const removeSpecialCharsAndWhitespace = /[^a-zA-Z0-9가-힣]/g;
+			
+			let arr = JSON.parse(JSON.stringify(extractedData));
+		
+			for (let i = 0; i < bannedList.length; i++) {
+				let banText = bannedList[i];				
+				banText = banText.toLowerCase().replace(removeSpecialCharsAndWhitespace, '');
+				if (banText == '' || banText == ' ' || banText == '	') { continue; }
+				
+				arr = arr.filter(data => {
+					const checker = data.nicknames.filter(nickname => {
+						nickname = String(nickname);
+					
+						// 소문자로 변환하고 특수 문자 및 공백을 제거합니다.
+						const lowerCaseItem = nickname.toLowerCase().replace(removeSpecialCharsAndWhitespace, '');
+						
+						// 부분적으로 일치하는 아이템을 찾습니다.
+						const incResult = lowerCaseItem.includes(banText);
+						
+						if(incResult) { parseLog(banText); }
+						
+						return incResult
+					});
+					
+					if (checker.length > 0) {
+						totalBannedData.push(data);
+						return false;
+					} else {
+						return true;
+					}
+				});
+			}
+			
+			return arr
+		}
+		
+		// 타겟 텍스트가 서치 텍스트를 포함하고 있는지 판별하는 함수 (공백, 특수문자 제거)
+		function SetWantedList(extractedData, wantedList) {
+			// 특수 문자 및 공백을 제거하는 정규 표현식
+			const removeSpecialCharsAndWhitespace = /[^a-zA-Z0-9가-힣]/g;
+			
+			wantedList.forEach(wantedName => {
+				const wantedText = wantedName.toLowerCase().replace(removeSpecialCharsAndWhitespace, '');
+			
+				extractedData.forEach(data => {
+					let nicknameTexts = [];
+					data.nicknames.forEach(nickname => {
+						nickname = String(nickname);
+						nicknameTexts.push(nickname.toLowerCase().replace(removeSpecialCharsAndWhitespace, ''));
+					});
+				
+					if (nicknameTexts.some(nickname => nickname.includes(wantedText))) {
+						data.wanted = true;
+					}
+				})
+			})
+		}
+		
+		function CalcOffsetDay(dateString) {
+			// 주어진 날짜 문자열에서 날짜 부분만 추출 (YYYY-MM-DD 형식)
+			const datePart = dateString.match(/\d{4}-\d{2}-\d{2}/);
+
+			if (datePart) {
+				// 날짜를 Date 객체로 파싱
+				const targetDate = new Date(datePart[0]);
+				
+				// 오늘 날짜를 가져옵니다
+				const today = new Date();
+				
+				// 대상 날짜와 오늘 날짜의 시간, 분, 초를 모두 0으로 설정
+				targetDate.setHours(0, 0, 0, 0);
+				today.setHours(0, 0, 0, 0);
+				
+				// 오늘과 대상 날짜 간의 차이 계산 (밀리초 단위)
+				const difference = targetDate - today;
+				
+				// 밀리초를 일로 변환
+				const differenceInDays = difference / (1000 * 60 * 60 * 24);
+
+				return differenceInDays;
+			} else {
+				console.log("날짜 문자열 형식이 잘못되었습니다.");
+				return 0;
+			}
+		}
+		
+		function ConvertTimeToMinutes(_time, _minutes) {
+			_time = parseInt(_time, 10);
+			_minutes = parseInt(_minutes, 10);
+			const minutesTime = ((_time * 60) + _minutes);
+			return minutesTime;
+		}
+		
+		function Int(textNum) {
+			return parseInt(textNum, 10);
+		}
+		
+		function log(data) {
+			console.log(data);
+		}
+		
+		function parseLog(data) {
+			console.log(JSON.parse(JSON.stringify(data)));
+		}
+    </script>
+	
+	<!-- 응답 데이터를 표시할 요소 -->
+	<pre id="result"></pre>
+	
+	<!-- 이 부분이 검색 루틴 조회 - SearchData 함수 호출시 조회할 사람 입력 하면됨 -->
+	<!-- 웹서버가 아닌 로컬 HTML 제한을 넘어서기 위해서는 최초 https://cors-anywhere.herokuapp.com/corsdemo 에서 등록 절차를 진행해야함 -->
+	<!-- fetch(url, {		 -->
+			<!-- mode: 'no-cors' -->
+		<!-- }) -->
+	<script>
+	function tableToJson(table) {
+		const data = [];
+		const headers = [];
+
+		// 테이블 헤더 추출
+		for (let i = 0; i < table.rows[0].cells.length; i++) {
+		  headers[i] = table.rows[0].cells[i].textContent.toLowerCase();
+		}
+		
+		const manCnt = headers.length - 2;
+
+		var storeName = "";
+		// 테이블 데이터 추출
+		for (let i = 1; i < table.rows.length; i++) {
+		  const row = table.rows[i];
+		  const rowData = {};
+		  
+		  if (row.cells.length == (2 + manCnt)){
+			storeName = row.cells[0].textContent;
+			for (let j = 0; j < row.cells.length; j++) {
+				rowData[headers[j]] = row.cells[j].textContent;
+			}
+		  } else {						  
+				rowData[headers[0]] = storeName;
+			for (let j = 0; j < row.cells.length; j++) {
+				rowData[headers[j + 1]] = row.cells[j].textContent;
+			}						  
+		  }
+
+		  data.push(rowData);
+		}
+
+		return data;
+	}
+	
+	function SearchData() {
+		let name1 = document.getElementById("user_1").value;
+		let name2 = document.getElementById("user_2").value;
+		let name3 = document.getElementById("user_3").value;
+		let name4 = document.getElementById("user_4").value;
+		
+		let usBannedBox = document.getElementById("usBannedList");
+		
+		//fetch(url, headers)
+		//fetch('https://cors-anywhere.herokuapp.com/' + url, headers)
+	
+		let arr = [];
+	
+		if (name1 !== '') { name1 = name1.toLowerCase(); }
+		if (name2 !== '') { name2 = name2.toLowerCase(); }
+		if (name3 !== '') { name3 = name3.toLowerCase(); }
+		if (name4 !== '') { name4 = name4.toLowerCase(); }
+		log(name1 + " / " + name2 + " / " + name3 + " / " + name4);
+		const url = 'https://colory.mooo.com/playable?'
+		.concat('name1=', name1, '&')
+		.concat('name2=', name2, '&')
+		.concat('name3=', name3, '&')
+		.concat('name4=', name4)
+		const headers = {
+		  method: 'GET',
+		  headers: {
+		  },
+		  mode: 'no-cors'
+		};
+		
+		fetch(url, headers)
+		  .then(response => response.text())
+		  .then(html => {
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(html, 'text/html');
+				
+				// 테이블 추출
+				const tables = doc.querySelectorAll('table');
+				Array.from(tables).forEach((table, index) => {
+					// 최종 Josn 데이터...
+					const jsonData = tableToJson(table);					
+					//console.log(jsonData);
+					const conditionMet = jsonData.filter(row => {
+						if (name1 !== '') { if (row[name1] === name1) { return true; } }
+						if (name2 !== '') { if (row[name2] === name2) { return true; } }
+						if (name3 !== '') { if (row[name3] === name3) { return true; } }
+						if (name4 !== '') { if (row[name4] === name4) { return true; } }
+						
+						return false;
+					})
+					conditionMet.forEach(data => {
+						const themeName = data['테마'];
+						if (themeName !== '' && themeName !== undefined) { arr.push(themeName); }
+					})
+				});
+				
+				if(arr.length > 0) {
+					arr = arr.map((item) => {
+						return item.replace(/\([^)]+\)/, '').trim();
+					});
+				}
+				
+				usBannedBox.value = "(총 " + arr.length + "개) " + arr;
+				usBannedList = arr;
+		  })
+		  .catch(error => {
+			console.error('Error fetching data:', error)			
+		  });
+	}
+	</script>
+</body>
+</html>
