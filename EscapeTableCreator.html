@@ -1596,10 +1596,7 @@
 		
 		let usBannedBox = document.getElementById("usBannedList");
 		
-		const headers = {
-			"Accept": "*/*",
-			"referrerPolicy": 'unsafe-url'
-		}
+		//fetch('https://cors-anywhere.herokuapp.com/' + url, headers)
 	
 		let arr = [];
 	
@@ -1613,7 +1610,14 @@
 		.concat('name2=', name2, '&')
 		.concat('name3=', name3, '&')
 		.concat('name4=', name4)
-		fetch('https://cors-anywhere.herokuapp.com/' + url, headers)
+		const headers = {
+			"method": 'GET',
+			"Referer": url,
+			"Origin": 'https://colory.mooo.com/',
+			"mode": 'no-cors'
+		}
+		
+		fetch(url, headers)
 		  .then(response => response.text())
 		  .then(html => {
 				const parser = new DOMParser();
