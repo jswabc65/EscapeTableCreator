@@ -53,18 +53,29 @@
 	</style>
 	
 	<style>
-    /* 들여쓰기를 위한 CSS 스타일 */
-    .indented-label {
-        text-indent: 20px; /* 들여쓰기 크기 지정 */
-    }
-</style>
+		/* 들여쓰기를 위한 CSS 스타일 */
+		.indented-label {
+			text-indent: 20px; /* 들여쓰기 크기 지정 */
+		}
+	</style>
+	
+	<style>
+        .select-container {
+            display: flex;
+            align-items: center;
+        }
+		
+		.custom-label {
+            width: 210px;
+        }
+    </style>
 </head>
 <body>
 	<!-- jQuery 라이브러리를 먼저 로드 -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 	<!-- UI - 타이틀 -->
-	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v3</p>
+	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v4</p>
 	
 	<!-- UI - 지역 옵션 박스 -->
 	<label for="Area">지역:</label>
@@ -83,16 +94,36 @@
 	<br>
 	
 	<!-- UI - 평점 입력 박스 -->
-	<label>테마 평점 필터 (0~10) :</label>
+	<label>평점 필터 (0~10) :</label>
 		<input type="number" id="minRating" min="0" max="10" value="0" style="width: 40px; text-align: center;">
 		<label> ~ </label>
 		<input type="number" id="maxRating" min="0" max="10" value="10" style="width: 40px; text-align: center;"><br>
 		
 	<!-- UI - 난이도 입력 박스 -->
-	<label>테마 난이도 필터 (0~10) :</label>
+	<label>난이도 필터 (0~10) :</label>
 		<input type="number" id="minDiff" min="0" max="10" value="0" style="width: 40px; text-align: center;">
 		<label> ~ </label>
 		<input type="number" id="maxDiff" min="0" max="10" value="10" style="width: 40px; text-align: center;"><br>
+		
+	<!-- UI - 공포도 입력 박스 -->
+	<div class="select-container">
+		<label class="custom-label">공포도 필터 :</label>
+		<select id="minFear">
+			<option style="width: 120px; text-align: center;" value= 0>없음</option>
+			<option style="width: 120px; text-align: center;" value= 0.5>거의 없음</option>
+			<option style="width: 120px; text-align: center;" value= 2>약간 있음</option>
+			<option style="width: 120px; text-align: center;" value= 4>무서움</option>
+			<option style="width: 120px; text-align: center;" value= 6>매우 무서움</option>
+		</select>
+		<label> ~ </label>
+		<select id="maxFear">
+			<option style="width: 120px; text-align: center;" value= 0.5 selected>없음</option>
+			<option style="width: 120px; text-align: center;" value= 2>거의 없음</option>
+			<option style="width: 120px; text-align: center;" value= 4>약간 있음</option>
+			<option style="width: 120px; text-align: center;" value= 6>무서움</option>
+			<option style="width: 120px; text-align: center;" value= 99 selected>매우 무서움</option>
+		</select>
+	</div>
 	
 	<!-- UI - 날짜 선택 박스 -->
 	<label for="dateSelect">날짜 선택:</label>
@@ -107,7 +138,7 @@
 	<label>:</label>
 	<input type="number" id="startMinute" min="0" max="59" value="0" style="width: 40px; text-align: center;">
 	<label> ~ </label>
-	<input type="number" id="endHour" min="0" max="24" value="23" style="width: 40px; text-align: center;">
+	<input type="number" id="endHour" min="0" max="26" value="23" style="width: 40px; text-align: center;">
 	<label>:</label>
 	<input type="number" id="endMinute" min="0" max="59" value="0" style="width: 40px; text-align: center;">
 	<br>
@@ -123,7 +154,7 @@
 		<label>:</label>
 		<input type="number" id="lunchMinute" min="0" max="59" value="30" style="width: 40px; text-align: center;"><br>
 		<label>점심 최소 시간 보장:</label>
-		<input type="number" id="lunchInterval" min="0" max="24" value="45" style="width: 40px; text-align: center;">
+		<input type="number" id="lunchInterval" min="0" max="120" value="45" style="width: 40px; text-align: center;">
 		<label>분</label>
 	</div>
 	<label for="dinnerChk" style="display: flex; align-items: center;">
@@ -136,7 +167,7 @@
 		<label>:</label>
 		<input type="number" id="dinnerMinute" min="0" max="59" value="30" style="width: 40px; text-align: center;"><br>
 		<label>저녁 최소 시간 보장:</label>
-		<input type="number" id="dinnerInterval" min="0" max="24" value="45" style="width: 40px; text-align: center;">
+		<input type="number" id="dinnerInterval" min="0" max="120" value="45" style="width: 40px; text-align: center;">
 		<label>분</label>
 	</div>
 	<br>
@@ -431,6 +462,8 @@
 		let maxRating;
 		let minDiff;
 		let maxDiff;
+		let minFear;
+		let maxFear;
 		let dayoffset;
 		let starttime;
 		let endtime;
@@ -495,6 +528,8 @@
 			maxRating = Int(document.getElementById("maxRating").value);
 			minDiff = Int(document.getElementById("minDiff").value);
 			maxDiff = Int(document.getElementById("maxDiff").value);
+			minFear = Int(document.getElementById("minFear").value);
+			maxFear = Int(document.getElementById("maxFear").value);
 			startHour = Int(document.getElementById("startHour").value);
 			startMinute = Int(document.getElementById("startMinute").value);
 			endHour = Int(document.getElementById("endHour").value);
@@ -510,8 +545,6 @@
 			lunch_flag = ori_lunch_flag;
 			dinner_flag = ori_dinner_flag;
 			totalBannedData = [];
-			
-			log(startHour, startMinute);
 			
 			MainProcess();
 		}
@@ -617,27 +650,35 @@
 							let hitsData = data.hits.map(hit => {
 								// dayoffset 값에 따라 reserveTimes 선택
 								let reserveTimes;
+								let url;
 								switch (dayoffset) {
 								  case 0:
 									reserveTimes = hit.reserve_times_int_d0;
+									url = hit.reserve_url_d0;
 									break;
 								  case 1:
 									reserveTimes = hit.reserve_times_int_d1;
+									url = hit.reserve_url_d1;
 									break;
 								  case 2:
 									reserveTimes = hit.reserve_times_int_d2;
+									url = hit.reserve_url_d2;
 									break;
 								  case 3:
 									reserveTimes = hit.reserve_times_int_d3;
+									url = hit.reserve_url_d3;
 									break;
 								  case 4:
 									reserveTimes = hit.reserve_times_int_d4;
+									url = hit.reserve_url_d4;
 									break;
 								  case 5:
 									reserveTimes = hit.reserve_times_int_d5;
+									url = hit.reserve_url_d5;
 									break;
 								  case 6:
 									reserveTimes = hit.reserve_times_int_d6;
+									url = hit.reserve_url_d6;
 									break;
 								  default:
 									reserveTimes = [];
@@ -665,6 +706,13 @@
 									return null;
 								}
 								
+								// 공포도가 minFear 미만이거나 maxFear 초과면 제거 (무서운것만 or 안무서운것만 원하는 사람을 위한 필터...)
+								if ((hit.fearTotalRating * 2) < minFear) {
+									return null;
+								} else if ((hit.fearTotalRating * 2) >= maxFear) {
+									return null;
+								}
+								
 								if (reserveTimes.length > 0) {
 									hit.nicknames.push(hit.title);
 									return {
@@ -675,8 +723,10 @@
 										geoY: hit._geo.lng,
 										rating: hit.recommendTotalRating * 10,
 										difficulty: hit.difficultyTotalRating * 2,
+										fear: hit.fearTotalRating * 2,
 										playtime: hit.playtime,
-										reserve_times: reserveTimes
+										reserve_times: reserveTimes,
+										url: url
 									}
 								} else {
 									return null;
@@ -860,13 +910,15 @@
 						playtime: anotherData[0].playtime,
 						rating: (anotherData[0].rating),
 						difficulty: (anotherData[0].difficulty),
+						fear: anotherData[0].fear,
 						time: anotherData[0].reserve_times[0],
 						score: anotherData[0].totalScore,
 						waitInterval: anotherData[0].reserve_times[0] - calcInterval,
 						momvingDist: anotherData[0].movingDist,
 						geoX: anotherData[0].geoX,
 						geoY: anotherData[0].geoY,
-						wanted: anotherData[0].wanted
+						wanted: anotherData[0].wanted,
+						url: anotherData[0].url
 					};
 					
 					// 점심 & 저녁 시간 체크 처리
@@ -1033,13 +1085,15 @@
 						playtime: data.playtime,
 						rating: (data.rating),
 						difficulty: (data.difficulty),
+						fear: data.fear,
 						time: data.reserve_times[0],
 						score: data.totalScore,
 						waitInterval: data.reserve_times[0] - targettime,
 						momvingDist: data.movingDist,
 						geoX: data.geoX,
 						geoY: data.geoY,
-						wanted: data.wanted
+						wanted: data.wanted,
+						url: data.url
 					};
 					
 					// 다음 targettime 계산
@@ -1276,8 +1330,8 @@
 			}
 		
 			const container = document.createElement("div");
-
-			// 각 스케쥴 출력
+			
+			// 추천 스케쥴 출력
 			PrintScheduleToTable(findHighestScoreSchedule(schedules), container, '■ 추천 스케줄');
 			container.appendChild(document.createElement("hr"));
 			container.appendChild(document.createElement("br"));
@@ -1291,18 +1345,27 @@
 			container.appendChild(document.createElement("br"));
 
 			PrintScheduleToTable(findLowestMovingDistScoreSchedule(schedules), container, '■ 낮은 이동거리 스케줄');
+			container.appendChild(document.createElement("hr"));
+			container.appendChild(document.createElement("br"));
 			
-			PrintAllThemeTime(schedules, extractedData, container);
+			// 전체 스케쥴 출력
+			/*for (i=0; i < schedules.length; i++) {
+				let schedule = schedules[i];
+				PrintScheduleToTable(schedule, container, '■ 그 외 스케쥴 - ' + i.toString())
+				container.appendChild(document.createElement("hr"));
+				container.appendChild(document.createElement("br"));
+			}*/
+			
+			// 전체 테마 출력
+			PrintAllThemeTime(extractedData, container);
+			container.appendChild(document.createElement("hr"));
+			container.appendChild(document.createElement("br"));			
 
 			resultElement.appendChild(container);
 		}
 		
 		// 추천 스케줄 출력 후 모든 테마를 출력해주는 로직
-		function PrintAllThemeTime(schedules, extractedData, container) {
-			if (schedules === null || schedules.length === 0) {
-				return;
-			}
-			
+		function PrintAllThemeTime(extractedData, container) {
 			// 항목 출력
 			const nameRow = document.createElement("div");
 			const nameCell = document.createElement("h2");
@@ -1316,7 +1379,7 @@
 			
 			// 헤더 출력
 			const headerRow = document.createElement("tr");
-			headerRow.innerHTML = '<th>No</th><th>테마명</th><th>매장</th><th>평점</th><th>난이도</th><th>예약 가능 테이블</th>';
+			headerRow.innerHTML = '<th>No</th><th>테마명</th><th>매장</th><th>평점</th><th>난이도</th><th>공포도</th><th>플레이타임</th><th>예약 가능 테이블</th><th>예약</th>';
 			table.appendChild(headerRow);
 			
 			// 평점 내림차순으로 정렬
@@ -1338,7 +1401,10 @@
 					'<td>' + item.store_name + '</td>' +
 					'<td>' + item.rating.toFixed(2) + '</td>' +
 					'<td>' + item.difficulty.toFixed(2) + '</td>' +
-					'<td>' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</td>';
+					'<td>' + GetFear(item.fear) + '</td>' +
+					'<td>' + item.playtime + '</td>' +
+					'<td>' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</td>' + 
+					'<td><a href="' + item.url + '" target="_blank">예약하기</a></td>';
 				table.appendChild(row);
 			}
 			
@@ -1352,7 +1418,10 @@
 					'<td><del style="color: #555;">' + item.store_name + '</del></td>' +
 					'<td><del style="color: #555;">' + item.rating.toFixed(2) + '</del></td>' +
 					'<td><del style="color: #555;">' + item.difficulty.toFixed(2) + '</del></td>' +
-					'<td><del style="color: #555;">' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</del></td>';
+					'<td><del style="color: #555;">' + GetFear(item.fear) + '</del></td>' +
+					'<td><del style="color: #555;">' + item.playtime + '</del></td>' +
+					'<td><del style="color: #555;">' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</del></td>' + 
+					'<td><a href="' + item.url + '" target="_blank">예약하기</a></td>';
 				table.appendChild(row);
 			}
 			
@@ -1383,7 +1452,12 @@
 
 			// 헤더 출력
 			const headerRow = document.createElement("tr");
-			headerRow.innerHTML = '<th>순서</th><th>시간</th><th>제목</th><th>가게</th><th>평점</th><th>난이도</th>';
+			const columns = ["순서", "시간", "제목", "매장", "평점", "난이도", "공포도", "예약"];
+			for (const column of columns) {
+			  const th = document.createElement("th");
+			  th.textContent = column;
+			  headerRow.appendChild(th);
+			}
 			table.appendChild(headerRow);
 
 			// 스케쥴 출력
@@ -1409,14 +1483,23 @@
 					'<td style="font-weight: bold; color: blue">' + item.title + '</td>' +
 					'<td>' + item.store + '</td>' +
 					'<td>' + item.rating.toFixed(2) + '</td>' +
-					'<td>' + item.difficulty.toFixed(2) + '</td>';
+					'<td>' + item.difficulty.toFixed(2) + '</td>' +
+					'<td>' + GetFear(item.fear) + '</td>' +
+					'<td><a href="' + item.url + '" target="_blank">예약하기</a></td>';
 				} else {
+					// "예약하기" 하이퍼링크 추가
+					const reservationLink = document.createElement("a");
+					reservationLink.textContent = "예약하기";
+					reservationLink.href = item.url;
+				
 					row.innerHTML = '<td>' + order + '</td>' +
 					'<td>' + start + ' ~ ' + end + ' (' + item.playtime + '분)</td>' +
 					'<td>' + item.title + '</td>' +
 					'<td>' + item.store + '</td>' +
 					'<td>' + item.rating.toFixed(2) + '</td>' +
-					'<td>' + item.difficulty.toFixed(2) + '</td>';
+					'<td>' + item.difficulty.toFixed(2) + '</td>' +
+					'<td>' + GetFear(item.fear) + '</td>' +
+					'<td><a href="' + item.url + '" target="_blank">예약하기</a></td>';
 				}
 				table.appendChild(row);
 
@@ -1501,6 +1584,24 @@
 					}
 				})
 			})
+		}
+		
+		function GetFear(fear) {
+			let fearTxt = fear.toFixed(2);
+			
+			if (fear < 0.5) {
+				fearTxt = fearTxt + ' (없음)';
+			} else if (fear < 2) {
+				fearTxt = fearTxt + ' (거의 없음)';
+			} else if (fear < 4) {
+				fearTxt = fearTxt + ' (약간 있음)';
+			} else if (fear < 6) {
+				fearTxt = fearTxt + ' (무서움)';
+			} else {
+				fearTxt = fearTxt + ' (매우 무서움)';
+			}
+			
+			return fearTxt;
 		}
 		
 		function CalcOffsetDay(dateString) {
