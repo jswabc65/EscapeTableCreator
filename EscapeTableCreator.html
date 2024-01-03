@@ -75,7 +75,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 	<!-- UI - 타이틀 -->
-	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v4</p>
+	<p style="font-size: 24px; font-weight: bold;">연방 생성기 by 트미J v5</p>
 	
 	<!-- UI - 지역 옵션 박스 -->
 	<label for="Area">지역:</label>
@@ -1379,7 +1379,7 @@
 			
 			// 헤더 출력
 			const headerRow = document.createElement("tr");
-			headerRow.innerHTML = '<th>No</th><th>테마명</th><th>매장</th><th>평점</th><th>난이도</th><th>공포도</th><th>플레이타임</th><th>예약 가능 테이블</th><th>예약</th>';
+			headerRow.innerHTML = '<th>No</th><th>테마명</th><th>예약 가능</th><th>플레이타임</th><th>매장</th><th>평점</th><th>난이도</th><th>공포도</th><th>예약</th>';
 			table.appendChild(headerRow);
 			
 			// 평점 내림차순으로 정렬
@@ -1397,13 +1397,13 @@
 				
 				const row = document.createElement("tr");
 				row.innerHTML = '<td>' + (j+1) + '</td>' +
-					'<td>' + item.title + '</td>' +
+					'<td style="width: 200px; white-space: pre-line;">' + item.title + '</td>' +
+					'<td style="text-align: center;">' + item.reserve_times.map(minutesToHHMM).join('<br>') + '</td>' + 
+					'<td style="text-align: center;">' + item.playtime + '</td>' +
 					'<td>' + item.store_name + '</td>' +
-					'<td>' + item.rating.toFixed(2) + '</td>' +
-					'<td>' + item.difficulty.toFixed(2) + '</td>' +
+					'<td style="text-align: center;">' + item.rating.toFixed(2) + '</td>' +
+					'<td style="text-align: center;">' + item.difficulty.toFixed(2) + '</td>' +
 					'<td>' + GetFear(item.fear) + '</td>' +
-					'<td>' + item.playtime + '</td>' +
-					'<td>' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</td>' + 
 					'<td><a href="' + item.url + '" target="_blank">예약하기</a></td>';
 				table.appendChild(row);
 			}
@@ -1414,13 +1414,13 @@
 				
 				const row = document.createElement("tr");
 				row.innerHTML = '<td><del style="color: #555;">' + (j+1) + '</td>' +
-					'<td><del style="color: #555;">' + item.title + '</del></td>' +
+					'<td style="width: 200px; white-space: pre-line;"><del style="color: #555;">' + item.title + '</del></td>' +
+					'<td style="text-align: center;"><del style="color: #555;">' + item.reserve_times.map(minutesToHHMM).join('<br>') + '</del></td>' + 
+					'<td style="text-align: center;"><del style="color: #555;">' + item.playtime + '</del></td>' +
 					'<td><del style="color: #555;">' + item.store_name + '</del></td>' +
-					'<td><del style="color: #555;">' + item.rating.toFixed(2) + '</del></td>' +
-					'<td><del style="color: #555;">' + item.difficulty.toFixed(2) + '</del></td>' +
+					'<td style="text-align: center;"><del style="color: #555;">' + item.rating.toFixed(2) + '</del></td>' +
+					'<td style="text-align: center;"><del style="color: #555;">' + item.difficulty.toFixed(2) + '</del></td>' +
 					'<td><del style="color: #555;">' + GetFear(item.fear) + '</del></td>' +
-					'<td><del style="color: #555;">' + item.playtime + '</del></td>' +
-					'<td><del style="color: #555;">' + item.reserve_times.map(minutesToHHMM).join(' / ') + '</del></td>' + 
 					'<td><a href="' + item.url + '" target="_blank">예약하기</a></td>';
 				table.appendChild(row);
 			}
