@@ -53,6 +53,23 @@
 	</style>
 	
 	<style>
+        .graph-container {
+            width: 100%;
+            border: 1px solid #000;
+            position: relative;
+            height: auto; /* 그래프 높이를 자동 조절 */
+            padding-bottom: 10px;
+        }
+        .bar {
+            height: 20px;
+            position: absolute;
+            color: white;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+    </style>
+	
+	<style>
 		/* 들여쓰기를 위한 CSS 스타일 */
 		.indented-label {
 			text-indent: 20px; /* 들여쓰기 크기 지정 */
@@ -71,6 +88,78 @@
     </style>
 </head>
 <body>
+	<!--
+	<input type="time" id="startTime" value="08:00">
+    <input type="time" id="endTime" value="18:00">
+    <br><br>
+    <input type="time" id="intervalStart">
+    <input type="time" id="intervalEnd">
+    <button onclick="addInterval()">Add Interval</button>
+    <br><br>
+    <div id="graph" class="graph-container"></div>
+	-->
+
+    <script>
+        var intervals = [];
+
+        function addInterval() {
+            var startTime = document.getElementById('startTime').value;
+            var endTime = document.getElementById('endTime').value;
+            var intervalStart = document.getElementById('intervalStart').value;
+            var intervalEnd = document.getElementById('intervalEnd').value;
+
+            var totalMinutes = timeDifferenceInMinutes(startTime, endTime);
+            var startDiff = timeDifferenceInMinutes(startTime, intervalStart);
+            var endDiff = timeDifferenceInMinutes(startTime, intervalEnd);
+
+            var newInterval = {
+                start: startDiff,
+                end: endDiff,
+                position: findPositionForInterval(startDiff, endDiff)
+            };
+
+            intervals.push(newInterval);
+
+            var startPercentage = (startDiff / totalMinutes) * 100;
+            var endPercentage = (endDiff / totalMinutes) * 100;
+
+            var bar = document.createElement('div');
+            bar.classList.add('bar');
+            bar.style.left = startPercentage + '%';
+            bar.style.width = (endPercentage - startPercentage) + '%';
+            bar.style.backgroundColor = getRandomColor();
+            bar.style.top = (newInterval.position * 30) + 'px'; // 막대의 위치를 조정
+            bar.innerHTML = intervalStart + ' - ' + intervalEnd;
+
+            document.getElementById('graph').appendChild(bar);
+        }
+
+        function findPositionForInterval(startDiff, endDiff) {
+            var position = 0;
+            while (intervals.some(interval => 
+                (interval.start < endDiff && interval.end > startDiff && interval.position === position))) {
+                position++;
+            }
+            return position;
+        }
+
+        function timeDifferenceInMinutes(time1, time2) {
+            var t1 = time1.split(':');
+            var t2 = time2.split(':');
+            return (parseInt(t2[0]) * 60 + parseInt(t2[1])) - (parseInt(t1[0]) * 60 + parseInt(t1[1]));
+        }
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
+
+
 	<!-- jQuery 라이브러리를 먼저 로드 -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
@@ -172,6 +261,7 @@
 	</div>
 	<br>
 	
+	<!--
 	<label>같이할 사람들의 전방 닉네임을 입력 후 '불러오기' 버튼을 누르세요. (불러온 후 타임테이블을 생성하세요!)</label><br>
 	<label>참여자 중 한명이라도 플레이한 테마들이 Banned List에 불러와집니다.</label><br>
 	<label>※ 코방 사용자 기능 페이지에서 정보 갱신 후 사용 가능합니다. ( <a href="https://colory.mooo.com/user" target="_blank">https://colory.mooo.com/user</a> )</label><br>
@@ -197,6 +287,7 @@
 	</table>
 	<button onclick="SearchData(user_1, user_2, user_3, user_4)" style="width: 100px; height: 30px; text-align: center; font-size: 17px; font-weight: bold;">불러오기</button><br><br>
 	<br>
+	-->
 	
 	<label>선호 테마 : 여기에 입력한 테마들을 우선 스케줄에 포함시킵니다.</label><br>
 	<label>(콤마 or 슬래쉬 or 줄바꿈을 이용하여 테마 이름을 구분해 주세요)</label><br>
@@ -243,9 +334,7 @@
 			<label>  - 제일 중요하면서 귀찮은 부분이 아래의 큰 텍스트 박스 영역인데요.</label><br>
 			<label>  - 위쪽 박스는 선호리스트로 해당 리스트에 원하는 테마명을 콤마, 슬래쉬, 줄바꿈 등으로 구분하여 입력해주시면 해당 테마를 우선시하여 스케줄을 잡아드립니다.</label><br>
 			<label>  - 물론, 우선시하는 것일 뿐 반드시 다 잡도록 짜주지는 않습니다. </label><br>
-			<label>  - 아랫쪽 박스는 원하지 않는 테마명을 입력하면 해당 테마들은 절대 스케줄에 포함되지 않습니다. </label><br>
-			<label>  - 사실, 코로리 방탈출의 '우리 모두 안 한 테마'의 정보를 받아와서 닉네임만 넣으면 자동 추가되게 해보려 했으나</label><br>
-			<label>  - 정보 긁어올 방법을 찾지 못해서 실패 했습니다. 그냥 손으로 입력해주세요 흑흑 ㅠㅠ</label><br><br>
+			<label>  - 아랫쪽 박스는 원하지 않는 테마명을 입력하면 해당 테마들은 절대 스케줄에 포함되지 않습니다. </label><br><br>
 		</div>
 		
 		<div>
@@ -254,7 +343,6 @@
 			<label style="color: red;">  - 빠방 예약 가능 데이터에 가끔 실제로는 예약이 안되는 건들도 존재하는데, 이는 연방 생성기에도 동일하게 발생합니다.</label><br>
 			<label style="color: red;">  - 따라서, 일정을 정하신 후 반드시 각 매장의 예약 페이지에서 실제 예약이 가능한지 크로스체크를 해보시기 바랍니다.</label><br>
 			<label style="color: red;">  - 빠방 측 요청 or 데이터 긁어오기가 막히게 될 시 서비스가 중지될 수 있습니다. </label><br>
-			<label style="color: red;">  - 코방 모두 안한 테마 기능이 막히게 될 시 서비스가 중지될 수 있습니다. </label><br>
 		</div>
 	</details>
 	
@@ -1737,6 +1825,8 @@
 						
 						return false;
 					})
+					
+					log(conditionMet);
 					
 					conditionMet.forEach(data => {
 						const themeName = data['테마'];
